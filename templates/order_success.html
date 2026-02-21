@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Заказ №{{ order.id }} оформлен{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:48px;padding-bottom:80px;max-width:700px;">
+
+  <!-- Заголовок успеха -->
+  <div style="text-align:center;margin-bottom:40px;">
+    <div style="width:80px;height:80px;border-radius:50%;background:var(--success);
+                display:flex;align-items:center;justify-content:center;
+                margin:0 auto 20px;font-size:2.5rem;color:#fff;">
+      <i class="bi bi-check-lg" aria-hidden="true"></i>
+    </div>
+    <h1 style="font-size:2rem;margin-bottom:8px;">Заказ оформлен!</h1>
+    <p style="color:var(--text-muted);font-size:1.05rem;">
+      Заказ <strong>№{{ order.id }}</strong> принят. Мы свяжемся с вами по телефону
+      <strong>{{ order.phone }}</strong> в ближайшее время.
+    </p>
+  </div>
+
+  <!-- Детали заказа -->
+  <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:28px;">
+
+    <!-- Шапка -->
+    <div style="background:var(--primary);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <span style="font-weight:700;font-size:1.1rem;">
+        <i class="bi bi-bag-check-fill" aria-hidden="true"></i> Заказ №{{ order.id }}
+      </span>
+      <span style="font-size:.9rem;">{{ order.created_at.strftime('%d.%m.%Y в %H:%M') }}</span>
+    </div>
+
+    <!-- Состав -->
+    <div style="padding:24px;">
+      <h3 style="font-size:.95rem;margin-bottom:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Состав заказа</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        {% for item in order.items %}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;">
+          <span style="font-size:.92rem;">
+            {{ item.product_name }}
+            <span style="color:var(--text-muted);">× {{ item.qty }}</span>
+          </span>
+          <span style="font-weight:600;white-space:nowrap;">{{ '{:,.0f}'.format(item.subtotal) }} ₽</span>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div style="border-top:2px solid var(--border);margin-top:16px;padding-top:16px;
+                  display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;font-size:1.05rem;">Итого</span>
+        <span style="font-size:1.3rem;font-weight:700;color:var(--primary);">{{ '{:,.0f}'.format(order.total) }} ₽</span>
+      </div>
+    </div>
+
+    <!-- Информация о доставке и оплате -->
+    <div style="border-top:1px solid var(--border);padding:24px;
+                display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Получатель</div>
+        <div style="font-weight:600;">{{ order.full_name }}</div>
+        <div style="font-size:.88rem;color:var(--text-secondary);">{{ order.phone }}</div>
+        <div style="font-size:.88rem;color:var(--text-secondary);">{{ order.email }}</div>
+      </div>
+      <div>
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Доставка</div>
+        <div style="font-weight:600;">
+          {% if order.delivery_type == 'pickup' %}
+          <i class="bi bi-shop" aria-hidden="true"></i> Самовывоз
+          {% else %}
+          <i class="bi bi-truck" aria-hidden="true"></i> Курьер
+          {% endif %}
+        </div>
+        {% if order.address %}
+        <div style="font-size:.88rem;color:var(--text-secondary);">{{ order.address }}</div>
+        {% endif %}
+      </div>
+      <div>
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Оплата</div>
+        <div style="font-weight:600;">
+          {% if order.payment_type == 'cash' %}
+          <i class="bi bi-cash" aria-hidden="true"></i> Наличными при получении
+          {% elif order.payment_type == 'card' %}
+          <i class="bi bi-credit-card" aria-hidden="true"></i> Картой при получении
+          {% else %}
+          <i class="bi bi-phone" aria-hidden="true"></i> Онлайн (СБП / карта)
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;">Статус</div>
+        <span style="display:inline-block;padding:4px 12px;border-radius:var(--r-full);
+                     background:rgba(74,124,89,.12);color:var(--success);font-weight:600;font-size:.88rem;">
+          {{ order.status_label }}
+        </span>
+      </div>
+    </div>
+
+    {% if order.comment %}
+    <div style="border-top:1px solid var(--border);padding:16px 24px;background:var(--bg-muted);">
+      <span style="font-size:.82rem;color:var(--text-muted);">Комментарий:</span>
+      <span style="font-size:.88rem;margin-left:8px;">{{ order.comment }}</span>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Что дальше -->
+  <div style="background:var(--bg-accent);border:1px solid var(--border-light);border-radius:var(--r-md);padding:20px 24px;margin-bottom:28px;">
+    <h3 style="font-size:.95rem;margin-bottom:12px;"><i class="bi bi-info-circle" aria-hidden="true"></i> Что дальше?</h3>
+    <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.9rem;color:var(--text-secondary);">
+      <li>Наш менеджер позвонит вам в течение <strong>30 минут</strong> для подтверждения.</li>
+      <li>После подтверждения заказ будет передан в доставку.</li>
+      <li>Срок доставки: <strong>1–3 рабочих дня</strong> (для курьера).</li>
+    </ol>
+  </div>
+
+  <!-- Кнопки -->
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="{{ url_for('profile_orders') }}" class="btn btn-primary btn-lg">
+      <i class="bi bi-list-ul" aria-hidden="true"></i> Мои заказы
+    </a>
+    <a href="{{ url_for('catalog') }}" class="btn btn-outline btn-lg">
+      <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Продолжить покупки
+    </a>
+  </div>
+
+</div>
+{% endblock %}

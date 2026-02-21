@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block description %}{{ article.preview or article.content[:160] }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <nav class="breadcrumb" aria-label="Путь навигации">
+    <a href="{{ url_for('index') }}">Главная</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <a href="{{ url_for('news') }}">Новости</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">{{ article.title }}</span>
+  </nav>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:48px;align-items:start;">
+
+    <!-- Основной контент -->
+    <article>
+      <header class="article-header">
+        <a href="{{ url_for('news', category=article.category) }}"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;
+                  color:var(--primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">
+          <i class="bi bi-tag-fill" aria-hidden="true"></i> {{ article.category }}
+        </a>
+        <h1>{{ article.title }}</h1>
+        <div class="article-meta">
+          <span>
+            <i class="bi bi-person" aria-hidden="true"></i>
+            {{ article.author.full_name if article.author else 'Редакция' }}
+          </span>
+          <span>
+            <i class="bi bi-calendar3" aria-hidden="true"></i>
+            <time datetime="{{ article.created_at.isoformat() }}">
+              {{ article.created_at.strftime('%d %B %Y г.') }}
+            </time>
+          </span>
+          <span>
+            <i class="bi bi-eye" aria-hidden="true"></i> {{ article.views }} просмотров
+          </span>
+        </div>
+      </header>
+
+      {% if article.image %}
+      <div class="article-cover">
+        <img src="{{ article.image }}" alt="{{ article.title }}" loading="eager">
+      </div>
+      {% endif %}
+
+      <div class="article-body">
+        {% for line in article.content.split('\n') %}
+          {% if line.startswith('**') and line.endswith('**') %}
+            <h2>{{ line[2:-2] }}</h2>
+          {% elif line.startswith('- ') %}
+            <ul><li>{{ line[2:] }}</li></ul>
+          {% elif line.strip() %}
+            <p>{{ line | replace('**', '') }}</p>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Теги / Поделиться -->
+      <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);
+                  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <a href="{{ url_for('news', category=article.category) }}"
+             class="badge badge-outline" style="font-size:.85rem;padding:6px 16px;">
+            {{ article.category }}
+          </a>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--text-muted);">
+          <span>Поделиться:</span>
+          <a href="https://vk.com/share.php?url={{ request.url }}" target="_blank" rel="noopener"
+             style="color:var(--text-secondary);" aria-label="Поделиться ВКонтакте">
+            <i class="bi bi-vk" style="font-size:1.1rem;" aria-hidden="true"></i>
+          </a>
+          <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" rel="noopener"
+             style="color:var(--text-secondary);" aria-label="Поделиться в Telegram">
+            <i class="bi bi-telegram" style="font-size:1.1rem;" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Боковая панель -->
+    <aside aria-label="Похожие материалы">
+
+      <!-- Похожие статьи -->
+      {% if related %}
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;margin-bottom:24px;">
+        <h3 style="font-size:1rem;margin-bottom:16px;">Читайте также</h3>
+        {% for a in related %}
+        <article style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
+          <a href="{{ url_for('news_detail', slug=a.slug) }}"
+             style="flex-shrink:0;width:64px;height:64px;border-radius:var(--r-sm);overflow:hidden;background:var(--bg-muted);">
+            <img src="{{ a.image }}" alt="{{ a.title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+          </a>
+          <div>
+            <a href="{{ url_for('news_detail', slug=a.slug) }}"
+               style="font-size:.85rem;font-weight:600;color:var(--text-primary);display:block;margin-bottom:4px;line-height:1.3;">
+              {{ a.title }}
+            </a>
+            <span style="font-size:.75rem;color:var(--text-muted);">
+              {{ a.created_at.strftime('%d.%m.%Y') }}
+            </span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Баннер каталога -->
+      <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+                  color:#fff;border-radius:var(--r-md);padding:24px;text-align:center;">
+        <i class="bi bi-house-heart-fill" style="font-size:2.5rem;margin-bottom:12px;display:block;" aria-hidden="true"></i>
+        <h3 style="color:#fff;font-size:1rem;margin-bottom:8px;">Каталог товаров</h3>
+        <p style="font-size:.83rem;opacity:.9;margin-bottom:16px;">Более 5 000 товаров для вашего дома</p>
+        <a href="{{ url_for('catalog') }}" class="btn"
+           style="background:#fff;color:var(--primary);border:2px solid #fff;font-size:.85rem;">
+          Смотреть каталог
+        </a>
+      </div>
+
+    </aside>
+  </div>
+</div>
+{% endblock %}

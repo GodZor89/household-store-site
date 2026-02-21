@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}{% if action == 'edit' %}Редактировать товар{% else %}Новый товар{% endif %} — Панель управления{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+  <div class="admin-layout">
+
+    {% include '_admin_sidebar.html' %}
+
+    <div>
+      <!-- Заголовок + хлебные крошки -->
+      <nav class="breadcrumb" aria-label="Путь навигации" style="margin-bottom:16px;">
+        <a href="{{ url_for('admin') }}">Панель</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href="{{ url_for('admin_products') }}">Товары</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">{% if action == 'edit' %}Редактировать{% else %}Добавить{% endif %}</span>
+      </nav>
+
+      <h1 style="margin-bottom:28px;">
+        <i class="bi bi-{% if action == 'edit' %}pencil-square{% else %}plus-square{% endif %}" aria-hidden="true"></i>
+        {% if action == 'edit' %}Редактировать товар{% else %}Добавить товар{% endif %}
+      </h1>
+
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:32px;max-width:800px;">
+        <form method="POST" novalidate>
+
+          <!-- Название -->
+          <div class="form-group">
+            <label class="form-label" for="name">Название <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="name" name="name" class="form-control" required
+                   value="{{ product.name if product else '' }}"
+                   placeholder="Например: Диван угловой «Комфорт»">
+          </div>
+
+          <!-- Категория + Цена в ряд -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="category_id">Категория <span style="color:var(--danger)">*</span></label>
+              <select id="category_id" name="category_id" class="form-control" required>
+                <option value="">— выберите —</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                  {% if product and product.category_id == cat.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stock">Остаток на складе</label>
+              <input type="number" id="stock" name="stock" class="form-control" min="0"
+                     value="{{ product.stock if product else 100 }}">
+            </div>
+          </div>
+
+          <!-- Цена + Старая цена -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="price">Цена (₽) <span style="color:var(--danger)">*</span></label>
+              <input type="number" id="price" name="price" class="form-control" required
+                     step="0.01" min="0.01"
+                     value="{{ product.price if product else '' }}"
+                     placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="old_price">Старая цена (₽) <span style="color:var(--text-muted);font-weight:400;">необязательно</span></label>
+              <input type="number" id="old_price" name="old_price" class="form-control"
+                     step="0.01" min="0"
+                     value="{{ product.old_price if product and product.old_price else '' }}"
+                     placeholder="0.00">
+            </div>
+          </div>
+
+          <!-- Краткое описание -->
+          <div class="form-group">
+            <label class="form-label" for="description">Краткое описание</label>
+            <textarea id="description" name="description" class="form-control" rows="3"
+                      placeholder="Одно-два предложения для карточки товара">{{ product.description if product else '' }}</textarea>
+          </div>
+
+          <!-- Полное описание -->
+          <div class="form-group">
+            <label class="form-label" for="full_description">Полное описание</label>
+            <textarea id="full_description" name="full_description" class="form-control" rows="6"
+                      placeholder="Подробные характеристики, материалы, размеры…">{{ product.full_description if product else '' }}</textarea>
+          </div>
+
+          <!-- URL изображения -->
+          <div class="form-group">
+            <label class="form-label" for="image">URL изображения</label>
+            <input type="url" id="image" name="image" class="form-control"
+                   value="{{ product.image if product else '' }}"
+                   placeholder="https://…">
+            <small style="color:var(--text-muted);font-size:.8rem;">
+              Оставьте пустым — будет подставлено случайное изображение.
+            </small>
+          </div>
+
+          <!-- Превью изображения -->
+          {% if product and product.image %}
+          <div style="margin-bottom:20px;">
+            <img src="{{ product.image }}" alt="Превью" id="imgPreview"
+                 style="max-width:200px;max-height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+          </div>
+          {% endif %}
+
+          <!-- Метки -->
+          <div class="form-group">
+            <label class="form-label">Метки товара</label>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" name="is_featured"
+                       {% if product and product.is_featured %}checked{% endif %}>
+                <span>⭐ Хит продаж</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" name="is_new"
+                       {% if product and product.is_new %}checked{% endif %}>
+                <span>🆕 Новинка</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" name="is_sale"
+                       {% if product and product.is_sale %}checked{% endif %}>
+                <span>🏷️ Скидка</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Кнопки -->
+          <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-{% if action == 'edit' %}check-lg{% else %}plus-lg{% endif %}" aria-hidden="true"></i>
+              {% if action == 'edit' %}Сохранить изменения{% else %}Добавить товар{% endif %}
+            </button>
+            <a href="{{ url_for('admin_products') }}" class="btn btn-outline btn-lg">
+              Отмена
+            </a>
+            {% if action == 'edit' %}
+            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline btn-lg"
+               target="_blank" rel="noopener">
+              <i class="bi bi-eye" aria-hidden="true"></i> На сайте
+            </a>
+            {% endif %}
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+/* Превью изображения при вводе URL */
+(function() {
+  const urlInput = document.getElementById('image');
+  if (!urlInput) return;
+  urlInput.addEventListener('change', function() {
+    let preview = document.getElementById('imgPreview');
+    if (!preview) {
+      preview = document.createElement('img');
+      preview.id = 'imgPreview';
+      preview.style.cssText = 'max-width:200px;max-height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);margin-bottom:20px;display:block;';
+      urlInput.parentElement.insertAdjacentElement('afterend', preview);
+    }
+    preview.src = this.value || '';
+  });
+})();
+</script>
+{% endblock %}
+{% endblock %}

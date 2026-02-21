@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ДомашнийУют{% endblock %} — Сеть магазинов товаров для дома</title>
+  <meta name="description" content="{% block description %}ДомашнийУют — широкий выбор товаров для дома: мебель, текстиль, декор, кухня, освещение и хранение. Доставка по всей России.{% endblock %}">
+  <meta name="keywords" content="товары для дома, мебель, текстиль, декор, кухня, освещение, хранение, ДомашнийУют">
+  <meta name="author" content="ДомашнийУют">
+
+  <!-- Google Fonts: Playfair Display (заголовки) + Inter (текст) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <!-- Основная тема (стандартная) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=3" id="main-css">
+
+  <!-- Тема для слабовидящих (по умолчанию отключена) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/accessibility.css') }}?v=3" id="access-css" disabled>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="standard-theme">
+
+<!-- =====================================================
+     ШАПКА САЙТА
+===================================================== -->
+<header class="site-header" role="banner">
+
+  <!-- Верхняя информационная полоска -->
+  <div class="header-top">
+    <div class="container">
+      <div class="header-top-inner">
+        <div class="header-contacts">
+          <a href="tel:+74951234567" aria-label="Позвонить">
+            <i class="bi bi-telephone-fill" aria-hidden="true"></i> +7 (495) 123-45-67
+          </a>
+          <a href="mailto:info@domashniuyt.ru" aria-label="Написать письмо">
+            <i class="bi bi-envelope-fill" aria-hidden="true"></i> info@domashniuyt.ru
+          </a>
+        </div>
+        <div class="header-top-links">
+          <span class="work-hours">
+            <i class="bi bi-clock-fill" aria-hidden="true"></i> Пн–Вс: 10:00–21:00
+          </span>
+          <!-- Переключатель темы (ГОСТ Р 52872-2012) -->
+          <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
+                  aria-label="Переключить тему для слабовидящих" type="button">
+            <i class="bi bi-eye" aria-hidden="true"></i>
+            <span class="toggle-text">Для слабовидящих</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Основная навигационная полоса -->
+  <nav class="main-nav" role="navigation" aria-label="Основное меню">
+    <div class="container">
+      <div class="nav-inner">
+
+        <!-- Логотип -->
+        <a href="{{ url_for('index') }}" class="logo" aria-label="ДомашнийУют — главная страница">
+          <div class="logo-icon" aria-hidden="true">
+            <i class="bi bi-house-heart-fill"></i>
+          </div>
+          <div class="logo-text">
+            <span class="logo-name">{{ site_name }}</span>
+            <span class="logo-tagline">Товары для дома</span>
+          </div>
+        </a>
+
+        <!-- Строка поиска -->
+        <div class="nav-search" role="search">
+          <form action="{{ url_for('search') }}" method="GET" class="search-form"
+                aria-label="Поиск по сайту">
+            <label for="searchInput" class="visually-hidden">Поиск по сайту</label>
+            <input type="text" name="q" id="searchInput"
+                   placeholder="Поиск товаров и статей..."
+                   autocomplete="off"
+                   value="{{ request.args.get('q', '') }}"
+                   aria-autocomplete="list"
+                   aria-controls="searchSuggestions">
+            <button type="submit" aria-label="Найти">
+              <i class="bi bi-search" aria-hidden="true"></i>
+            </button>
+          </form>
+          <div class="search-suggestions" id="searchSuggestions" role="listbox"
+               aria-label="Результаты поиска"></div>
+        </div>
+
+        <!-- Иконки действий -->
+        <div class="nav-actions">
+          <!-- Корзина -->
+          <a href="{{ url_for('cart_view') }}" class="nav-action" aria-label="Корзина{% if cart_count %}: {{ cart_count }} товар(ов){% endif %}">
+            <i class="bi bi-cart3" aria-hidden="true"></i>
+            {% if cart_count > 0 %}
+            <span class="action-badge" aria-hidden="true">{{ cart_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- Профиль / Вход -->
+          {% if current_user.is_authenticated %}
+          <div class="nav-user-menu" id="userMenuWrap">
+            <button class="nav-action user-btn" type="button"
+                    id="userMenuBtn"
+                    aria-label="Меню пользователя {{ current_user.username }}"
+                    aria-haspopup="true"
+                    aria-expanded="false">
+              <i class="bi bi-person-circle" aria-hidden="true"></i>
+            </button>
+            <div class="user-dropdown" id="userDropdown" role="menu">
+              <div class="user-dropdown-inner">
+                <div class="user-dropdown-header">
+                  <strong>{{ current_user.full_name or current_user.username }}</strong>
+                  <small>{{ current_user.email }}</small>
+                </div>
+                <a href="{{ url_for('profile') }}" role="menuitem">
+                  <i class="bi bi-person" aria-hidden="true"></i> Личный кабинет
+                </a>
+                {% if current_user.is_manager() %}
+                <a href="{{ url_for('admin') }}" role="menuitem">
+                  <i class="bi bi-gear" aria-hidden="true"></i> Панель управления
+                </a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="logout-link" role="menuitem">
+                  <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Выйти
+                </a>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <a href="{{ url_for('login') }}" class="nav-action" aria-label="Войти в аккаунт">
+            <i class="bi bi-person" aria-hidden="true"></i>
+          </a>
+          {% endif %}
+
+          <!-- Бургер-кнопка (мобильная) -->
+          <button class="burger-btn" id="burgerBtn"
+                  aria-label="Открыть меню" aria-expanded="false"
+                  aria-controls="categoryNav" type="button">
+            <span></span><span></span><span></span>
+          </button>
+        </div><!-- /.nav-actions -->
+
+      </div><!-- /.nav-inner -->
+
+      <!-- Меню категорий -->
+      <div class="category-nav" id="categoryNav" role="navigation" aria-label="Категории товаров">
+        <ul class="category-menu">
+          <li>
+            <a href="{{ url_for('catalog') }}"
+               {% if request.endpoint == 'catalog' and not request.view_args.get('category_slug') %}class="active"{% endif %}>
+              <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Все товары
+            </a>
+          </li>
+          {% for cat in categories %}
+          <li>
+            <a href="{{ url_for('catalog', category_slug=cat.slug) }}"
+               {% if request.view_args and request.view_args.get('category_slug') == cat.slug %}class="active"{% endif %}>
+              <i class="bi {{ cat.icon }}" aria-hidden="true"></i> {{ cat.name }}
+            </a>
+          </li>
+          {% endfor %}
+          <li>
+            <a href="{{ url_for('news') }}"
+               {% if request.endpoint in ('news','news_detail') %}class="active"{% endif %}>
+              <i class="bi bi-newspaper" aria-hidden="true"></i> Новости
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('promotions') }}"
+               {% if request.endpoint == 'promotions' %}class="active"{% endif %}>
+              <i class="bi bi-tag-fill" aria-hidden="true"></i> Акции
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('about') }}"
+               {% if request.endpoint == 'about' %}class="active"{% endif %}>
+              <i class="bi bi-info-circle" aria-hidden="true"></i> О нас
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('contacts') }}"
+               {% if request.endpoint == 'contacts' %}class="active"{% endif %}>
+              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Контакты
+            </a>
+          </li>
+        </ul>
+      </div><!-- /.category-nav -->
+
+    </div><!-- /.container -->
+  </nav>
+
+</header><!-- /header -->
+
+<!-- =====================================================
+     ОСНОВНОЕ СОДЕРЖИМОЕ
+===================================================== -->
+<main class="main-content" id="main-content" role="main">
+
+  <!-- Flash-сообщения (уведомления) -->
+  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  <div class="flash-messages container" role="alert" aria-live="polite">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">
+      <i class="bi bi-{% if category == 'success' %}check-circle-fill
+                      {% elif category == 'danger' %}x-circle-fill
+                      {% elif category == 'warning' %}exclamation-triangle-fill
+                      {% else %}info-circle-fill{% endif %}" aria-hidden="true"></i>
+      {{ message }}
+      <button class="flash-close" onclick="this.parentElement.remove()"
+              type="button" aria-label="Закрыть уведомление">&times;</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+</main><!-- /main -->
+
+<!-- =====================================================
+     ПОДВАЛ
+===================================================== -->
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- О компании -->
+      <div class="footer-col">
+        <div class="footer-logo">
+          <i class="bi bi-house-heart-fill" aria-hidden="true"></i>
+          <span>{{ site_name }}</span>
+        </div>
+        <p>Сеть магазинов товаров для дома. Создаём уют в каждом доме с 2010 года. Более 5 000 товаров в ассортименте.</p>
+        <div class="social-links" aria-label="Социальные сети">
+          <a href="#" aria-label="ВКонтакте"><i class="bi bi-vk" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Telegram"><i class="bi bi-telegram" aria-hidden="true"></i></a>
+          <a href="#" aria-label="YouTube"><i class="bi bi-youtube" aria-hidden="true"></i></a>
+          <a href="#" aria-label="Дзен"><i class="bi bi-rss" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <!-- Каталог -->
+      <div class="footer-col">
+        <h4>Каталог</h4>
+        <ul>
+          {% for cat in categories %}
+          <li><a href="{{ url_for('catalog', category_slug=cat.slug) }}">{{ cat.name }}</a></li>
+          {% endfor %}
+          <li><a href="{{ url_for('catalog') }}">Все товары</a></li>
+        </ul>
+      </div>
+
+      <!-- Покупателям -->
+      <div class="footer-col">
+        <h4>Покупателям</h4>
+        <ul>
+          <li><a href="{{ url_for('promotions') }}">Акции и скидки</a></li>
+          <li><a href="{{ url_for('news') }}">Новости</a></li>
+          <li><a href="{{ url_for('about') }}">О компании</a></li>
+          <li><a href="{{ url_for('contacts') }}">Контакты</a></li>
+          <li><a href="{{ url_for('sitemap') }}">Карта сайта</a></li>
+          {% if not current_user.is_authenticated %}
+          <li><a href="{{ url_for('register') }}">Регистрация</a></li>
+          <li><a href="{{ url_for('login') }}">Войти</a></li>
+          {% endif %}
+        </ul>
+      </div>
+
+      <!-- Контакты -->
+      <div class="footer-col">
+        <h4>Контакты</h4>
+        <div class="footer-contacts">
+          <p><i class="bi bi-telephone-fill" aria-hidden="true"></i>
+            <a href="tel:+74951234567">+7 (495) 123-45-67</a></p>
+          <p><i class="bi bi-telephone-fill" aria-hidden="true"></i>
+            <a href="tel:+78001234567">8 800 123-45-67</a> <small>(бесплатно)</small></p>
+          <p><i class="bi bi-envelope-fill" aria-hidden="true"></i>
+            <a href="mailto:info@domashniuyt.ru">info@domashniuyt.ru</a></p>
+          <p><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Москва, ул. Садовая, 15</p>
+          <p><i class="bi bi-clock-fill" aria-hidden="true"></i> Пн–Вс: 10:00–21:00</p>
+        </div>
+      </div>
+
+    </div><!-- /.footer-grid -->
+
+    <div class="footer-bottom">
+      <p>&copy; {{ current_year }} {{ site_name }}. Все права защищены.</p>
+      <p>Разработано в рамках учебной практики</p>
+    </div>
+
+  </div><!-- /.container -->
+</footer><!-- /footer -->
+
+<!-- Скрипт для скрытия текста с экрана, но доступного screen reader'ам -->
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<!-- Основной JavaScript -->
+<script src="{{ url_for('static', filename='js/main.js') }}?v=3"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

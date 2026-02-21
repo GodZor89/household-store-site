@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <i class="bi bi-house-heart-fill" aria-hidden="true"></i>
+      <h1>Вход в аккаунт</h1>
+      <p>Введите логин и пароль для входа</p>
+    </div>
+
+    <form action="{{ url_for('login') }}" method="POST" novalidate aria-label="Форма входа">
+
+      <div class="form-group">
+        <label for="username" class="form-label">
+          Логин или Email <span class="req" aria-label="обязательное поле">*</span>
+        </label>
+        <input type="text" id="username" name="username" class="form-control"
+               placeholder="Ваш логин или email" required autocomplete="username"
+               value="{{ request.form.get('username', '') }}" autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">
+          Пароль <span class="req" aria-label="обязательное поле">*</span>
+        </label>
+        <input type="password" id="password" name="password" class="form-control"
+               placeholder="Ваш пароль" required autocomplete="current-password">
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <label class="checkbox-label" style="margin-bottom:0;">
+          <input type="checkbox" name="remember" value="1">
+          <span style="font-size:.88rem;">Запомнить меня</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Войти
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Нет аккаунта? <a href="{{ url_for('register') }}">Зарегистрироваться</a></p>
+    </div>
+
+    <!-- Тестовые учётные записи (только для учебного проекта) -->
+    <div style="margin-top:24px;padding:16px;background:var(--bg-muted);border-radius:var(--r-sm);font-size:.8rem;color:var(--text-muted);">
+      <strong style="display:block;margin-bottom:8px;color:var(--text-secondary);">
+        <i class="bi bi-info-circle" aria-hidden="true"></i> Тестовые учётные записи:
+      </strong>
+      <div><code>admin</code> / <code>admin123</code> — администратор</div>
+      <div><code>manager</code> / <code>manager123</code> — менеджер</div>
+      <div><code>user1</code> / <code>user1234</code> — покупатель</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

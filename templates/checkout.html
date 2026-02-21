@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+
+  <nav class="breadcrumb" aria-label="Путь навигации" style="margin-bottom:24px;">
+    <a href="{{ url_for('index') }}">Главная</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <a href="{{ url_for('cart_view') }}">Корзина</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">Оформление заказа</span>
+  </nav>
+
+  <h1 style="margin-bottom:32px;">
+    <i class="bi bi-bag-check" aria-hidden="true"></i> Оформление заказа
+  </h1>
+
+  <form method="POST" novalidate id="checkoutForm">
+  <div class="cart-layout">
+
+    <!-- ===== Левая колонка: форма ===== -->
+    <div style="display:flex;flex-direction:column;gap:24px;">
+
+      <!-- Данные получателя -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;"
+               aria-labelledby="section-contact">
+        <h2 id="section-contact" style="font-size:1.1rem;margin-bottom:20px;">
+          <i class="bi bi-person" aria-hidden="true"></i> Данные получателя
+        </h2>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label" for="full_name">Имя и фамилия <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="full_name" name="full_name" class="form-control" required
+                   value="{{ form.get('full_name', '') }}" placeholder="Иван Иванов">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="phone">Телефон <span style="color:var(--danger)">*</span></label>
+            <input type="tel" id="phone" name="phone" class="form-control" required
+                   value="{{ form.get('phone', '') }}" placeholder="+7 (___) ___-__-__">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email <span style="color:var(--danger)">*</span></label>
+            <input type="email" id="email" name="email" class="form-control" required
+                   value="{{ form.get('email', '') }}" placeholder="mail@example.com">
+          </div>
+        </div>
+      </section>
+
+      <!-- Способ доставки -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;"
+               aria-labelledby="section-delivery">
+        <h2 id="section-delivery" style="font-size:1.1rem;margin-bottom:20px;">
+          <i class="bi bi-truck" aria-hidden="true"></i> Способ доставки
+        </h2>
+
+        <!-- Радио-кнопки доставки -->
+        <div style="display:grid;gap:12px;margin-bottom:20px;">
+          <label class="delivery-option" id="opt-courier">
+            <input type="radio" name="delivery_type" value="courier"
+                   {% if form.get('delivery_type','courier') == 'courier' %}checked{% endif %}
+                   onchange="toggleAddress(this.value)">
+            <div class="delivery-option-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:600;"><i class="bi bi-truck" aria-hidden="true"></i> Курьерская доставка</span>
+                <span style="color:var(--success);font-weight:600;">{% if total >= 5000 %}Бесплатно{% else %}от 490 ₽{% endif %}</span>
+              </div>
+              <small style="color:var(--text-muted);">Доставка до двери. Срок: 1–3 рабочих дня.</small>
+            </div>
+          </label>
+
+          <label class="delivery-option" id="opt-pickup">
+            <input type="radio" name="delivery_type" value="pickup"
+                   {% if form.get('delivery_type') == 'pickup' %}checked{% endif %}
+                   onchange="toggleAddress(this.value)">
+            <div class="delivery-option-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:600;"><i class="bi bi-shop" aria-hidden="true"></i> Самовывоз из магазина</span>
+                <span style="color:var(--success);font-weight:600;">Бесплатно</span>
+              </div>
+              <small style="color:var(--text-muted);">Москва, Садовая 15 · Пн–Вс 10:00–21:00</small>
+            </div>
+          </label>
+        </div>
+
+        <!-- Адрес (только для курьера) -->
+        <div id="address-block">
+          <div class="form-group">
+            <label class="form-label" for="address">Адрес доставки <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="address" name="address" class="form-control"
+                   value="{{ form.get('address', '') }}"
+                   placeholder="Город, улица, дом, квартира">
+          </div>
+        </div>
+      </section>
+
+      <!-- Способ оплаты -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;"
+               aria-labelledby="section-payment">
+        <h2 id="section-payment" style="font-size:1.1rem;margin-bottom:20px;">
+          <i class="bi bi-credit-card" aria-hidden="true"></i> Способ оплаты
+        </h2>
+
+        <div style="display:grid;gap:12px;">
+          {% set pay_methods = [
+            ('cash',   'bi-cash',        'Наличными при получении',    'Оплата курьеру или в магазине'),
+            ('card',   'bi-credit-card', 'Картой при получении',       'Терминал у курьера или в магазине'),
+            ('online', 'bi-phone',       'Онлайн (СБП / карта)',       'Безопасная оплата на сайте банка'),
+          ] %}
+          {% for val, icon, label, hint in pay_methods %}
+          <label class="delivery-option">
+            <input type="radio" name="payment_type" value="{{ val }}"
+                   {% if form.get('payment_type', 'cash') == val %}checked{% endif %}>
+            <div class="delivery-option-body">
+              <span style="font-weight:600;"><i class="bi {{ icon }}" aria-hidden="true"></i> {{ label }}</span>
+              <small style="color:var(--text-muted);">{{ hint }}</small>
+            </div>
+          </label>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Комментарий -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;">
+        <h2 style="font-size:1.1rem;margin-bottom:16px;">
+          <i class="bi bi-chat-left-text" aria-hidden="true"></i> Комментарий к заказу
+        </h2>
+        <textarea name="comment" class="form-control" rows="3"
+                  placeholder="Дополнительные пожелания, код домофона, удобное время…">{{ form.get('comment', '') }}</textarea>
+      </section>
+
+    </div><!-- /left col -->
+
+    <!-- ===== Правая колонка: итого ===== -->
+    <div>
+      <div class="cart-summary" aria-labelledby="order-summary-heading" style="position:sticky;top:100px;">
+        <h2 id="order-summary-heading" class="cart-summary-title">Ваш заказ</h2>
+
+        <!-- Список товаров -->
+        {% for item in items %}
+        <div class="cart-summary-row" style="align-items:flex-start;gap:8px;">
+          <span style="font-size:.85rem;color:var(--text-secondary);">
+            {{ item.product.name[:35] }}{% if item.product.name|length > 35 %}…{% endif %}
+            <span style="color:var(--text-muted);">× {{ item.qty }}</span>
+          </span>
+          <span style="white-space:nowrap;font-weight:600;">{{ '{:,.0f}'.format(item.subtotal) }} ₽</span>
+        </div>
+        {% endfor %}
+
+        <div style="border-top:1px solid var(--border-light);margin:12px 0;"></div>
+
+        <!-- Доставка -->
+        <div class="cart-summary-row">
+          <span>Доставка</span>
+          <span>{% if total >= 5000 %}<span style="color:var(--success);">Бесплатно</span>{% else %}от 490 ₽{% endif %}</span>
+        </div>
+
+        <!-- Промокод -->
+        <div style="margin:16px 0;">
+          <label for="promo_code" class="form-label" style="font-size:.82rem;">Промокод</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="promo_code" name="promo_code" class="form-control"
+                   value="{{ form.get('promo_code', '') }}"
+                   placeholder="Введите промокод"
+                   style="text-transform:uppercase;"
+                   aria-label="Промокод">
+          </div>
+        </div>
+
+        <!-- Итого -->
+        <div class="cart-summary-total">
+          <span>Итого</span>
+          <span class="price">{{ '{:,.0f}'.format(total) }} ₽</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:20px;">
+          <i class="bi bi-bag-check-fill" aria-hidden="true"></i> Подтвердить заказ
+        </button>
+
+        <a href="{{ url_for('cart_view') }}" class="btn btn-outline btn-block"
+           style="margin-top:10px;text-align:center;display:block;">
+          <i class="bi bi-arrow-left" aria-hidden="true"></i> Вернуться в корзину
+        </a>
+
+        <p style="font-size:.78rem;color:var(--text-muted);margin-top:16px;text-align:center;">
+          <i class="bi bi-shield-check" aria-hidden="true"></i>
+          Нажимая «Подтвердить заказ», вы соглашаетесь с условиями продажи.
+        </p>
+      </div>
+    </div><!-- /right col -->
+
+  </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Опция доставки/оплаты */
+.delivery-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: border-color var(--t), background var(--t);
+}
+.delivery-option:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--bg-accent);
+}
+.delivery-option input[type=radio] {
+  margin-top: 3px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.delivery-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleAddress(val) {
+  const block = document.getElementById('address-block');
+  const input = document.getElementById('address');
+  if (val === 'pickup') {
+    block.style.display = 'none';
+    input.required = false;
+  } else {
+    block.style.display = 'block';
+    input.required = true;
+  }
+}
+// Инициализация при загрузке
+(function() {
+  const checked = document.querySelector('input[name="delivery_type"]:checked');
+  if (checked) toggleAddress(checked.value);
+})();
+</script>
+{% endblock %}

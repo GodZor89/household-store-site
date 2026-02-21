@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Ошибка сервера — 500{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div>
+    <div class="error-number" aria-hidden="true">500</div>
+    <div class="error-icon" aria-hidden="true">
+      <i class="bi bi-exclamation-triangle"></i>
+    </div>
+    <h2>Внутренняя ошибка сервера</h2>
+    <p>
+      На сервере произошла непредвиденная ошибка.<br>
+      Мы уже работаем над её устранением. Попробуйте вернуться позже.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-house" aria-hidden="true"></i> На главную
+      </a>
+      <a href="{{ url_for('catalog') }}" class="btn btn-outline btn-lg">
+        <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Каталог
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

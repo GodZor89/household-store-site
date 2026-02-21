@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+
+  <div class="admin-layout">
+
+    <!-- Боковая панель -->
+    {% include '_admin_sidebar.html' %}
+
+    <!-- Основной контент -->
+    <div>
+      <h1 style="margin-bottom:28px;">
+        <i class="bi bi-speedometer2" aria-hidden="true"></i> Панель управления
+      </h1>
+
+      <!-- Карточки статистики -->
+      <div class="stats-cards" style="margin-bottom:32px;" aria-label="Статистика сайта">
+        {% set stats_items = [
+          ('bi-bag-check-fill', 'success', stats.orders, 'Заказов'),
+          ('bi-bag-exclamation-fill', 'danger', stats.orders_new, 'Новых заказов'),
+          ('bi-box-seam', 'primary', stats.products, 'Товаров'),
+          ('bi-people-fill', 'success', stats.users, 'Пользователей'),
+          ('bi-newspaper', 'info', stats.news, 'Статей'),
+          ('bi-envelope-exclamation-fill', 'warning', stats.unread_messages, 'Непрочитанных'),
+        ] %}
+        {% for icon, color, value, label in stats_items %}
+        <div class="stat-mini">
+          <div class="stat-mini-icon {{ color }}" aria-hidden="true">
+            <i class="bi {{ icon }}"></i>
+          </div>
+          <div>
+            <div class="stat-mini-value">{{ value }}</div>
+            <div class="stat-mini-label">{{ label }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Входящие сообщения -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;margin-bottom:24px;"
+               aria-labelledby="messages-heading">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <h2 id="messages-heading" style="font-size:1.1rem;">
+            <i class="bi bi-chat-dots" aria-hidden="true"></i> Входящие сообщения
+            {% if stats.unread_messages > 0 %}
+            <span class="badge badge-sale" style="font-size:.75rem;margin-left:8px;">
+              {{ stats.unread_messages }} новых
+            </span>
+            {% endif %}
+          </h2>
+        </div>
+
+        {% if recent_messages %}
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="Список сообщений">
+            <thead>
+              <tr>
+                <th scope="col">Дата</th>
+                <th scope="col">Отправитель</th>
+                <th scope="col">Email</th>
+                <th scope="col">Тема</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Действие</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for msg in recent_messages %}
+              <tr class="{% if not msg.is_read %}unread{% endif %}"
+                  style="{% if not msg.is_read %}background:rgba(193,127,89,.05);{% endif %}">
+                <td style="white-space:nowrap;">{{ msg.created_at.strftime('%d.%m %H:%M') }}</td>
+                <td style="font-weight:{% if not msg.is_read %}700{% else %}400{% endif %};">
+                  {{ msg.name }}
+                </td>
+                <td>
+                  <a href="mailto:{{ msg.email }}" style="font-size:.85rem;">{{ msg.email }}</a>
+                </td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                  {{ msg.subject or msg.content[:50] }}
+                </td>
+                <td>
+                  {% if msg.is_read %}
+                  <span style="color:var(--success);font-size:.82rem;">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Прочитано
+                  </span>
+                  {% else %}
+                  <span style="color:var(--warning);font-size:.82rem;font-weight:700;">
+                    <i class="bi bi-circle-fill" aria-hidden="true"></i> Новое
+                  </span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if not msg.is_read %}
+                  <button type="button" class="btn btn-outline btn-sm"
+                          data-mark-read="{{ msg.id }}"
+                          aria-label="Отметить сообщение от {{ msg.name }} прочитанным">
+                    <i class="bi bi-check2" aria-hidden="true"></i>
+                  </button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p style="text-align:center;color:var(--text-muted);padding:20px 0;">
+          Сообщений пока нет.
+        </p>
+        {% endif %}
+      </section>
+
+      <!-- Последние пользователи -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;"
+               aria-labelledby="users-heading">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <h2 id="users-heading" style="font-size:1.1rem;">
+            <i class="bi bi-people" aria-hidden="true"></i> Последние пользователи
+          </h2>
+          {% if current_user.is_admin() %}
+          <div style="display:flex;gap:8px;">
+            <a href="{{ url_for('admin_user_create') }}" class="btn btn-primary btn-sm">
+              <i class="bi bi-person-plus" aria-hidden="true"></i> Создать
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="btn btn-outline btn-sm">
+              Все пользователи
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="Список пользователей">
+            <thead>
+              <tr>
+                <th scope="col">Логин</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Email</th>
+                <th scope="col">Роль</th>
+                <th scope="col">Дата</th>
+                <th scope="col">Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in recent_users %}
+              <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.full_name or '—' }}</td>
+                <td style="font-size:.85rem;">{{ user.email }}</td>
+                <td>
+                  <span class="badge {% if user.role == 'admin' %}badge-sale{% elif user.role == 'manager' %}badge-featured{% else %}badge-outline{% endif %}">
+                    {% if user.role == 'admin' %}Администратор
+                    {% elif user.role == 'manager' %}Менеджер
+                    {% else %}Покупатель{% endif %}
+                  </span>
+                </td>
+                <td style="font-size:.82rem;white-space:nowrap;">
+                  {{ user.created_at.strftime('%d.%m.%Y') }}
+                </td>
+                <td>
+                  <span style="color:{% if user.is_active %}var(--success){% else %}var(--danger){% endif %};font-size:.82rem;">
+                    {{ 'Активен' if user.is_active else 'Заблокирован' }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-layout -->
+</div>
+{% endblock %}

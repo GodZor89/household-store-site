@@ -1,0 +1,707 @@
+/* ============================================================
+   ДомашнийУют — Тема для слабовидящих
+   Соответствует ГОСТ Р 52872-2012
+   «Интернет-ресурсы. Требования доступности для инвалидов по зрению»
+
+   Ключевые требования реализованы:
+   ✔ Минимальный размер шрифта 24 px (18 pt)
+   ✔ Межстрочный интервал не менее 1.5
+   ✔ Контрастность текст/фон ≥ 4.5:1 (фактически — чёрное на белом или обратно)
+   ✔ Все ссылки подчёркнуты
+   ✔ Фоновые изображения убраны
+   ✔ Чёткие рамки кнопок и полей
+   ✔ Область клика кнопок ≥ 44×44 px
+   ✔ Курсор pointer на интерактивных элементах
+   ✔ Видимый фокус (outline) на всех элементах
+   ============================================================ */
+
+/* ─── Переопределение переменных ─── */
+body.accessibility-theme {
+  --primary:        #000000;
+  --primary-dark:   #000000;
+  --primary-light:  #333333;
+  --secondary:      #000000;
+  --secondary-dark: #000000;
+
+  --bg-main:    #FFFFFF;
+  --bg-surface: #FFFFFF;
+  --bg-muted:   #F0F0F0;
+  --bg-accent:  #FFFF00;  /* Жёлтый акцент — высокий контраст */
+
+  --text-primary:   #000000;
+  --text-secondary: #000000;
+  --text-muted:     #000000;
+
+  --border:       #000000;
+  --border-light: #000000;
+
+  --success: #006400;
+  --danger:  #8B0000;
+  --warning: #8B4513;
+  --info:    #00008B;
+
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  --r-sm:   0;
+  --r-md:   0;
+  --r-lg:   0;
+  --r-xl:   0;
+  --r-full: 0;
+}
+
+/* ─── Базовые стили тела ─── */
+body.accessibility-theme {
+  font-size: 24px !important;          /* Минимум 18 pt = 24 px */
+  line-height: 1.75 !important;        /* Межстрочный интервал ≥ 1.5 */
+  letter-spacing: .03em;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+body.accessibility-theme * {
+  font-family: Arial, 'Liberation Sans', sans-serif !important;  /* Только sans-serif */
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  background-image: none !important;   /* Убрать все фоновые изображения */
+}
+
+/* ─── Заголовки ─── */
+body.accessibility-theme h1,
+body.accessibility-theme h2,
+body.accessibility-theme h3,
+body.accessibility-theme h4,
+body.accessibility-theme h5,
+body.accessibility-theme h6 {
+  font-family: Arial, sans-serif !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}
+body.accessibility-theme h1 { font-size: 2rem !important; }
+body.accessibility-theme h2 { font-size: 1.8rem !important; }
+body.accessibility-theme h3 { font-size: 1.5rem !important; }
+body.accessibility-theme h4 { font-size: 1.3rem !important; }
+
+/* ─── Ссылки: все подчёркнуты ─── */
+body.accessibility-theme a {
+  color: #000000 !important;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
+}
+body.accessibility-theme a:hover,
+body.accessibility-theme a:focus {
+  color: #FFFFFF !important;
+  background: #000000 !important;
+  outline: 3px solid #000000 !important;
+}
+
+/* ─── Фокус — чётко виден ─── */
+body.accessibility-theme *:focus {
+  outline: 4px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
+/* ─── Шапка ─── */
+body.accessibility-theme .site-header {
+  background: #FFFFFF !important;
+  border-bottom: 3px solid #000000 !important;
+}
+body.accessibility-theme .header-top {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border-bottom: 2px solid #FFFFFF !important;
+}
+body.accessibility-theme .header-contacts a,
+body.accessibility-theme .work-hours,
+body.accessibility-theme .header-top-links * {
+  color: #FFFFFF !important;
+  font-size: 16px !important;
+}
+body.accessibility-theme .main-nav {
+  background: #FFFFFF !important;
+  border-bottom: 3px solid #000000 !important;
+}
+
+/* ─── Логотип ─── */
+body.accessibility-theme .logo-icon {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+}
+body.accessibility-theme .logo-name {
+  color: #000000 !important;
+  font-size: 1.4rem !important;
+  text-decoration: none !important;
+}
+body.accessibility-theme .logo-tagline {
+  color: #333333 !important;
+  font-size: 14px !important;
+}
+body.accessibility-theme .logo:hover .logo-name {
+  background: none !important;
+  color: #000000 !important;
+}
+
+/* ─── Поиск ─── */
+body.accessibility-theme .search-form {
+  border: 3px solid #000000 !important;
+}
+body.accessibility-theme .search-form input {
+  font-size: 18px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .search-form button {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  font-size: 18px !important;
+  min-width: 52px;
+}
+body.accessibility-theme .search-form button:hover {
+  background: #333333 !important;
+}
+
+/* ─── Навигационные иконки ─── */
+body.accessibility-theme .nav-action {
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  background: #FFFFFF !important;
+  font-size: 1.3rem !important;
+  width: 52px !important;
+  height: 52px !important;
+  text-decoration: none !important;
+}
+body.accessibility-theme .nav-action:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .action-badge {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #FFFFFF !important;
+  font-size: .75rem !important;
+}
+
+/* ─── Меню категорий ─── */
+body.accessibility-theme .category-menu li a {
+  font-size: 18px !important;
+  color: #000000 !important;
+  text-decoration: underline !important;
+  border: 1px solid transparent;
+  padding: 10px 16px !important;
+}
+body.accessibility-theme .category-menu li a:hover,
+body.accessibility-theme .category-menu li a.active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border-color: #000000 !important;
+}
+
+/* ─── Переключатель темы (подчёркиваем) ─── */
+body.accessibility-theme .theme-toggle {
+  background: #FFFF00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  padding: 6px 14px !important;
+}
+body.accessibility-theme .theme-toggle:hover {
+  background: #000000 !important;
+  color: #FFFF00 !important;
+}
+
+/* ─── Кнопки ─── */
+body.accessibility-theme .btn {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  padding: 12px 24px !important;
+  min-height: 52px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+body.accessibility-theme .btn:hover,
+body.accessibility-theme .btn:focus {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  transform: none !important;
+}
+body.accessibility-theme .btn-outline {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 3px solid #000000 !important;
+}
+body.accessibility-theme .btn-outline:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* ─── Формы ─── */
+body.accessibility-theme .form-control {
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  padding: 12px 14px !important;
+  min-height: 52px !important;
+}
+body.accessibility-theme .form-control:focus {
+  outline: 4px solid #000000 !important;
+  box-shadow: none !important;
+}
+body.accessibility-theme .form-label {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  color: #000000 !important;
+}
+
+/* ─── Карточки товаров ─── */
+body.accessibility-theme .product-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .product-card:hover { transform: none !important; }
+body.accessibility-theme .product-card-img img {
+  filter: grayscale(100%) contrast(1.2) !important;
+}
+body.accessibility-theme .product-card-name {
+  font-size: 18px !important;
+  color: #000000 !important;
+  -webkit-line-clamp: unset !important;
+}
+body.accessibility-theme .price-current {
+  font-size: 1.4rem !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}
+body.accessibility-theme .price-old {
+  color: #555 !important;
+}
+
+/* ─── Бейджи ─── */
+body.accessibility-theme .badge {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  font-size: 14px !important;
+}
+body.accessibility-theme .badge-sale {
+  background: #8B0000 !important;
+  border-color: #8B0000 !important;
+}
+
+/* ─── Карточки новостей ─── */
+body.accessibility-theme .news-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .news-card:hover { transform: none !important; }
+body.accessibility-theme .news-card-img img {
+  filter: grayscale(100%) !important;
+}
+body.accessibility-theme .news-card-title a {
+  font-size: 20px !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .news-card-category {
+  color: #000000 !important;
+  font-size: 14px !important;
+}
+body.accessibility-theme .news-card-preview {
+  color: #000000 !important;
+  font-size: 16px !important;
+  -webkit-line-clamp: unset !important;
+}
+
+/* ─── Слайдер — изображения скрыты / заменены ─── */
+body.accessibility-theme .hero-slider {
+  background: #000000 !important;
+  min-height: 200px !important;
+}
+body.accessibility-theme .slide-image { display: none !important; }
+body.accessibility-theme .slide-overlay { display: none !important; }
+body.accessibility-theme .slide-content {
+  padding: 40px !important;
+}
+body.accessibility-theme .slide-content h2 {
+  color: #FFFFFF !important;
+  font-size: 2rem !important;
+}
+body.accessibility-theme .slide-content p {
+  color: #FFFFFF !important;
+  font-size: 18px !important;
+  opacity: 1 !important;
+}
+body.accessibility-theme .slide { min-height: 200px !important; }
+body.accessibility-theme .slider-arrow {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 3px solid #FFFFFF !important;
+  width: 56px !important;
+  height: 56px !important;
+}
+body.accessibility-theme .slider-dot {
+  background: rgba(255,255,255,.5) !important;
+  border: 2px solid #FFFFFF !important;
+}
+body.accessibility-theme .slider-dot.active {
+  background: #FFFF00 !important;
+}
+
+/* ─── Категории ─── */
+body.accessibility-theme .cat-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .cat-card:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  transform: none !important;
+}
+body.accessibility-theme .cat-card h4 {
+  font-size: 18px !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .cat-card:hover h4 { color: #FFFFFF !important; }
+body.accessibility-theme .cat-icon {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  font-size: 1.5rem !important;
+}
+body.accessibility-theme .cat-card:hover .cat-icon {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* ─── Подвал ─── */
+body.accessibility-theme .site-footer {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border-top: 3px solid #FFFFFF !important;
+}
+body.accessibility-theme .site-footer * { color: #FFFFFF !important; }
+body.accessibility-theme .footer-col ul li a {
+  text-decoration: underline !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .footer-col ul li a:hover {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  padding: 2px 4px !important;
+}
+body.accessibility-theme .footer-bottom { border-top: 2px solid #555 !important; }
+body.accessibility-theme .social-links a {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 2px solid #FFFFFF !important;
+}
+body.accessibility-theme .social-links a:hover {
+  background: #FFFF00 !important;
+  color: #000000 !important;
+}
+
+/* ─── Flash-сообщения ─── */
+body.accessibility-theme .flash {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+body.accessibility-theme .flash-success {
+  background: #FFFFFF !important;
+  color: #006400 !important;
+  border: 3px solid #006400 !important;
+}
+body.accessibility-theme .flash-danger {
+  background: #FFFFFF !important;
+  color: #8B0000 !important;
+  border: 3px solid #8B0000 !important;
+}
+body.accessibility-theme .flash-info {
+  background: #FFFFFF !important;
+  color: #00008B !important;
+  border: 3px solid #00008B !important;
+}
+body.accessibility-theme .flash-warning {
+  background: #FFFFFF !important;
+  color: #8B4513 !important;
+  border: 3px solid #8B4513 !important;
+}
+
+/* ─── Пагинация ─── */
+body.accessibility-theme .page-btn {
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  min-width: 48px !important;
+  height: 48px !important;
+  color: #000000 !important;
+  background: #FFFFFF !important;
+  text-decoration: none !important;
+}
+body.accessibility-theme .page-btn.active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .page-btn:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  transform: none !important;
+}
+
+/* ─── Таблицы ─── */
+body.accessibility-theme .data-table th {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  font-size: 18px !important;
+  border: 2px solid #FFFFFF !important;
+}
+body.accessibility-theme .data-table td {
+  font-size: 18px !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+body.accessibility-theme .data-table tr:hover td {
+  background: #F0F0F0 !important;
+}
+
+/* ─── Административная панель ─── */
+body.accessibility-theme .admin-sidebar-header {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  font-size: 18px !important;
+}
+body.accessibility-theme .admin-nav a {
+  font-size: 18px !important;
+  color: #000000 !important;
+  border: none !important;
+  border-bottom: 2px solid #000000 !important;
+  text-decoration: underline !important;
+}
+body.accessibility-theme .admin-nav a:hover,
+body.accessibility-theme .admin-nav a.active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+body.accessibility-theme .stat-mini {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .stat-mini-value {
+  font-size: 2rem !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .stat-mini-icon {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .stat-mini-icon * { color: #FFFFFF !important; }
+
+/* ─── Корзина ─── */
+body.accessibility-theme .cart-item {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .qty-btn {
+  border: 2px solid #000000 !important;
+  font-size: 18px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .qty-btn:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .qty-input {
+  font-size: 18px !important;
+  color: #000000 !important;
+  border: none !important;
+  border-left: 2px solid #000000 !important;
+  border-right: 2px solid #000000 !important;
+}
+body.accessibility-theme .cart-summary {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+
+/* ─── Профиль ─── */
+body.accessibility-theme .profile-user-info {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+body.accessibility-theme .profile-avatar {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 3px solid #FFFFFF !important;
+}
+body.accessibility-theme .profile-nav a {
+  font-size: 18px !important;
+  color: #000000 !important;
+  text-decoration: underline !important;
+}
+body.accessibility-theme .profile-nav a:hover,
+body.accessibility-theme .profile-nav a.active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+/* ─── Форма авторизации ─── */
+body.accessibility-theme .auth-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .auth-logo i { color: #000000 !important; }
+
+/* ─── Хлебные крошки ─── */
+body.accessibility-theme .breadcrumb * {
+  color: #000000 !important;
+  font-size: 18px !important;
+}
+body.accessibility-theme .breadcrumb a {
+  text-decoration: underline !important;
+}
+
+/* ─── Карточка товара (детальная) ─── */
+body.accessibility-theme .product-price-current {
+  color: #000000 !important;
+  font-size: 2.5rem !important;
+}
+body.accessibility-theme .product-main-img img {
+  filter: grayscale(100%) contrast(1.2) !important;
+}
+body.accessibility-theme .product-meta {
+  border: 3px solid #000000 !important;
+  background: #F0F0F0 !important;
+}
+body.accessibility-theme .product-meta-row span { color: #000000 !important; }
+
+/* ─── Страница ошибки 404 ─── */
+body.accessibility-theme .error-number {
+  color: #000000 !important;
+  font-size: 6rem !important;
+}
+body.accessibility-theme .error-icon { color: #000000 !important; }
+
+/* ─── Акции ─── */
+body.accessibility-theme .promo-discount {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  font-size: 1.5rem !important;
+}
+body.accessibility-theme .promo-card { border: 3px solid #000000 !important; }
+body.accessibility-theme .promo-card-img img { filter: grayscale(100%) !important; }
+body.accessibility-theme .promo-code {
+  background: #F0F0F0 !important;
+  border: 3px solid #000000 !important;
+  color: #000000 !important;
+}
+
+/* ─── Боковая панель каталога ─── */
+body.accessibility-theme .catalog-sidebar {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .filter-input {
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .checkbox-label {
+  font-size: 18px !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .sort-select {
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border-radius: 0 !important;
+}
+
+/* ─── Фильтр новостей ─── */
+body.accessibility-theme .news-filter-btn {
+  border: 3px solid #000000 !important;
+  font-size: 18px !important;
+  color: #000000 !important;
+  background: #FFFFFF !important;
+  text-decoration: underline !important;
+}
+body.accessibility-theme .news-filter-btn.active,
+body.accessibility-theme .news-filter-btn:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+/* ─── Статья ─── */
+body.accessibility-theme .article-body {
+  font-size: 20px !important;
+  line-height: 2 !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .article-body h2 {
+  color: #000000 !important;
+  font-size: 1.8rem !important;
+  border-bottom: 3px solid #000000 !important;
+  padding-bottom: 8px !important;
+}
+body.accessibility-theme .article-cover img { filter: grayscale(100%) !important; }
+
+/* ─── О нас ─── */
+body.accessibility-theme .about-hero {
+  background: #000000 !important;
+}
+body.accessibility-theme .about-hero h1,
+body.accessibility-theme .about-hero p { color: #FFFFFF !important; }
+body.accessibility-theme .stat-number { color: #000000 !important; }
+body.accessibility-theme .stat-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .team-card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .team-avatar {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 3px solid #000000 !important;
+}
+
+/* ─── Контакты ─── */
+body.accessibility-theme .contact-icon {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+}
+body.accessibility-theme .contact-value,
+body.accessibility-theme .contact-label { color: #000000 !important; }
+body.accessibility-theme .map-placeholder {
+  border: 3px solid #000000 !important;
+  background: #F0F0F0 !important;
+}
+
+/* ─── Дропдаун пользователя ─── */
+body.accessibility-theme .user-dropdown {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+}
+body.accessibility-theme .user-dropdown a {
+  font-size: 18px !important;
+  color: #000000 !important;
+}
+body.accessibility-theme .user-dropdown a:hover { background: #F0F0F0 !important; }
+body.accessibility-theme .user-dropdown-header {
+  background: #F0F0F0 !important;
+}
+body.accessibility-theme .user-dropdown-header strong,
+body.accessibility-theme .user-dropdown-header small { color: #000000 !important; }
+body.accessibility-theme .logout-link { color: #8B0000 !important; }

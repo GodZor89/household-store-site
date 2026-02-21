@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Страница не найдена — 404{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <div>
+    <div class="error-number" aria-hidden="true">404</div>
+    <div class="error-icon" aria-hidden="true">
+      <i class="bi bi-house-slash"></i>
+    </div>
+    <h2>Страница не найдена</h2>
+    <p>
+      Запрашиваемая страница не существует или была удалена.<br>
+      Проверьте правильность адреса или воспользуйтесь навигацией.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-house" aria-hidden="true"></i> На главную
+      </a>
+      <a href="{{ url_for('catalog') }}" class="btn btn-outline btn-lg">
+        <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Каталог
+      </a>
+    </div>
+    <!-- Популярные категории -->
+    <div style="margin-top:40px;">
+      <p style="color:var(--text-muted);margin-bottom:16px;">Популярные разделы:</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+        {% for cat in categories %}
+        <a href="{{ url_for('catalog', category_slug=cat.slug) }}" class="badge badge-outline" style="font-size:.85rem;padding:6px 16px;">
+          {{ cat.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

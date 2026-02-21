@@ -1,0 +1,68 @@
+<!-- Боковая панель администратора (partial-шаблон, include) -->
+<aside class="admin-sidebar">
+  <div class="admin-sidebar-header">
+    <i class="bi bi-speedometer2" aria-hidden="true"></i> Управление
+  </div>
+  <nav class="admin-nav" aria-label="Меню администратора">
+    <a href="{{ url_for('admin') }}"
+       {% if request.endpoint == 'admin' %}class="active"{% endif %}>
+      <i class="bi bi-grid-1x2" aria-hidden="true"></i> Дашборд
+    </a>
+
+    <!-- Товары -->
+    <a href="{{ url_for('admin_products') }}"
+       {% if request.endpoint in ('admin_products','admin_product_create','admin_product_edit') %}class="active"{% endif %}>
+      <i class="bi bi-box-seam" aria-hidden="true"></i> Товары
+    </a>
+    <a href="{{ url_for('admin_product_create') }}"
+       style="padding-left:2rem;font-size:.85rem;"
+       {% if request.endpoint == 'admin_product_create' %}class="active"{% endif %}>
+      <i class="bi bi-plus" aria-hidden="true"></i> Добавить товар
+    </a>
+
+    <!-- Новости -->
+    <a href="{{ url_for('admin_news_list') }}"
+       {% if request.endpoint in ('admin_news_list','admin_news_create','admin_news_edit') %}class="active"{% endif %}>
+      <i class="bi bi-newspaper" aria-hidden="true"></i> Новости
+    </a>
+    <a href="{{ url_for('admin_news_create') }}"
+       style="padding-left:2rem;font-size:.85rem;"
+       {% if request.endpoint == 'admin_news_create' %}class="active"{% endif %}>
+      <i class="bi bi-plus" aria-hidden="true"></i> Добавить статью
+    </a>
+
+    <!-- Заказы -->
+    <a href="{{ url_for('admin_orders') }}"
+       {% if request.endpoint in ('admin_orders','admin_order_detail') %}class="active"{% endif %}>
+      <i class="bi bi-bag-check" aria-hidden="true"></i> Заказы
+    </a>
+
+    <!-- Акции -->
+    <a href="{{ url_for('admin_promotions_list') }}"
+       {% if request.endpoint in ('admin_promotions_list','admin_promo_create','admin_promo_edit') %}class="active"{% endif %}>
+      <i class="bi bi-tag" aria-hidden="true"></i> Акции
+    </a>
+    <a href="{{ url_for('admin_promo_create') }}"
+       style="padding-left:2rem;font-size:.85rem;"
+       {% if request.endpoint == 'admin_promo_create' %}class="active"{% endif %}>
+      <i class="bi bi-plus" aria-hidden="true"></i> Добавить акцию
+    </a>
+
+    {% if current_user.is_admin() %}
+    <!-- Пользователи (только admin) -->
+    <a href="{{ url_for('admin_users') }}"
+       {% if request.endpoint in ('admin_users','admin_user_create') %}class="active"{% endif %}>
+      <i class="bi bi-people" aria-hidden="true"></i> Пользователи
+    </a>
+    <a href="{{ url_for('admin_user_create') }}"
+       style="padding-left:2rem;font-size:.85rem;"
+       {% if request.endpoint == 'admin_user_create' %}class="active"{% endif %}>
+      <i class="bi bi-person-plus" aria-hidden="true"></i> Создать пользователя
+    </a>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" style="margin-top:8px;border-top:1px solid var(--border-light);padding-top:12px;">
+      <i class="bi bi-house" aria-hidden="true"></i> На сайт
+    </a>
+  </nav>
+</aside>

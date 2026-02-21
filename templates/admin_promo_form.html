@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}{% if action == 'edit' %}Редактировать акцию{% else %}Новая акция{% endif %} — Панель управления{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+  <div class="admin-layout">
+
+    {% include '_admin_sidebar.html' %}
+
+    <div>
+      <nav class="breadcrumb" aria-label="Путь навигации" style="margin-bottom:16px;">
+        <a href="{{ url_for('admin') }}">Панель</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href="{{ url_for('admin_promotions_list') }}">Акции</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">{% if action == 'edit' %}Редактировать{% else %}Добавить{% endif %}</span>
+      </nav>
+
+      <h1 style="margin-bottom:28px;">
+        <i class="bi bi-tag" aria-hidden="true"></i>
+        {% if action == 'edit' %}Редактировать акцию{% else %}Добавить акцию{% endif %}
+      </h1>
+
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:32px;max-width:700px;">
+        <form method="POST" novalidate>
+
+          <!-- Название -->
+          <div class="form-group">
+            <label class="form-label" for="title">Название <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="title" name="title" class="form-control" required
+                   value="{{ promo.title if promo else '' }}"
+                   placeholder="Скидка 20% на всю мебель">
+          </div>
+
+          <!-- Описание -->
+          <div class="form-group">
+            <label class="form-label" for="description">Описание</label>
+            <textarea id="description" name="description" class="form-control" rows="4"
+                      placeholder="Подробности акции: условия, ограничения, даты…">{{ promo.description if promo else '' }}</textarea>
+          </div>
+
+          <!-- Скидка + Промокод -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label" for="discount_text">Текст скидки</label>
+              <input type="text" id="discount_text" name="discount_text" class="form-control"
+                     value="{{ promo.discount_text if promo else '' }}"
+                     placeholder="−20% / 3=2 / Подарок">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="promo_code">Промокод</label>
+              <input type="text" id="promo_code" name="promo_code" class="form-control"
+                     value="{{ promo.promo_code if promo and promo.promo_code else '' }}"
+                     placeholder="SUMMER20"
+                     style="font-family:monospace;text-transform:uppercase;">
+            </div>
+          </div>
+
+          <!-- URL изображения -->
+          <div class="form-group">
+            <label class="form-label" for="image">URL изображения</label>
+            <input type="url" id="image" name="image" class="form-control"
+                   value="{{ promo.image if promo else '' }}"
+                   placeholder="https://…">
+          </div>
+
+          {% if promo and promo.image %}
+          <div style="margin-bottom:20px;">
+            <img src="{{ promo.image }}" alt="Превью"
+                 style="max-width:260px;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+          </div>
+          {% endif %}
+
+          <!-- Статус -->
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+              <input type="checkbox" name="is_active"
+                     {% if not promo or promo.is_active %}checked{% endif %}>
+              <span>Акция активна (отображается на сайте)</span>
+            </label>
+          </div>
+
+          <!-- Кнопки -->
+          <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-check-lg" aria-hidden="true"></i>
+              {% if action == 'edit' %}Сохранить{% else %}Добавить акцию{% endif %}
+            </button>
+            <a href="{{ url_for('admin_promotions_list') }}" class="btn btn-outline btn-lg">Отмена</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

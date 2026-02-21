@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% block title %}{% if current_category %}{{ current_category.name }}{% else %}Каталог товаров{% endif %}{% endblock %}
+{% block description %}{% if current_category %}{{ current_category.description }}{% else %}Весь ассортимент товаров для дома в интернет-магазине ДомашнийУют.{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Хлебные крошки -->
+  <nav class="breadcrumb" aria-label="Путь навигации">
+    <a href="{{ url_for('index') }}">Главная</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    {% if current_category %}
+    <a href="{{ url_for('catalog') }}">Каталог</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">{{ current_category.name }}</span>
+    {% else %}
+    <span aria-current="page">Каталог</span>
+    {% endif %}
+  </nav>
+
+  <!-- Заголовок -->
+  <div style="margin-bottom:28px;">
+    <h1>{% if current_category %}{{ current_category.name }}{% else %}Все товары{% endif %}</h1>
+    {% if current_category and current_category.description %}
+    <p style="color:var(--text-secondary);margin-top:8px;">{{ current_category.description }}</p>
+    {% endif %}
+  </div>
+
+  <div class="catalog-layout">
+
+    <!-- ─── Боковая панель с фильтрами ─── -->
+    <aside class="catalog-sidebar" aria-label="Фильтры каталога">
+      <form method="GET" id="filter-form">
+        <!-- Скрытые поля для сохранения категории -->
+        {% if search_q %}
+        <input type="hidden" name="q" value="{{ search_q }}">
+        {% endif %}
+
+        <h2 class="sidebar-title"><i class="bi bi-funnel" aria-hidden="true"></i> Фильтры</h2>
+
+        <!-- Фильтр по цене -->
+        <div class="sidebar-section">
+          <label>Цена, ₽</label>
+          <div class="filter-input-row">
+            <input type="number" name="price_min" class="filter-input"
+                   placeholder="от" min="0"
+                   value="{{ request.args.get('price_min', '') }}"
+                   aria-label="Цена от">
+            <span class="filter-sep">—</span>
+            <input type="number" name="price_max" class="filter-input"
+                   placeholder="до" min="0"
+                   value="{{ request.args.get('price_max', '') }}"
+                   aria-label="Цена до">
+          </div>
+        </div>
+
+        <!-- Дополнительные фильтры -->
+        <div class="sidebar-section">
+          <label>Особые условия</label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="new" value="1"
+                   {% if request.args.get('new') %}checked{% endif %}
+                   aria-label="Только новинки">
+            <span>Только новинки</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="sale" value="1"
+                   {% if request.args.get('sale') %}checked{% endif %}
+                   aria-label="Только со скидкой">
+            <span>Только со скидкой</span>
+          </label>
+        </div>
+
+        <!-- Категории (в сайдбаре) -->
+        <div class="sidebar-section">
+          <label>Категории</label>
+          <ul style="list-style:none;padding:0;">
+            <li style="margin-bottom:6px;">
+              <a href="{{ url_for('catalog') }}"
+                 style="font-size:.88rem;{% if not current_category %}font-weight:700;color:var(--primary);{% else %}color:var(--text-secondary);{% endif %}">
+                Все товары
+              </a>
+            </li>
+            {% for cat in categories %}
+            <li style="margin-bottom:6px;">
+              <a href="{{ url_for('catalog', category_slug=cat.slug) }}"
+                 style="font-size:.88rem;{% if current_category and current_category.id == cat.id %}font-weight:700;color:var(--primary);{% else %}color:var(--text-secondary);{% endif %}">
+                <i class="bi {{ cat.icon }}" aria-hidden="true"></i> {{ cat.name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-bottom:8px;">
+          <i class="bi bi-funnel-fill" aria-hidden="true"></i> Применить
+        </button>
+        <a href="{{ url_for('catalog', category_slug=current_category.slug if current_category else None) }}"
+           class="btn btn-outline btn-block">
+          <i class="bi bi-x-circle" aria-hidden="true"></i> Сбросить
+        </a>
+      </form>
+    </aside>
+
+    <!-- ─── Основная область ─── -->
+    <div>
+
+      <!-- Тулбар: поиск, сортировка, счётчик -->
+      <div class="catalog-toolbar">
+        <form method="GET" style="flex:1;max-width:360px;" action="{{ url_for('catalog', category_slug=current_category.slug if current_category else None) }}">
+          <div class="search-form" style="border-radius:var(--r-sm);">
+            <input type="text" name="q" placeholder="Поиск в каталоге…"
+                   value="{{ search_q }}" aria-label="Поиск в каталоге">
+            <button type="submit" aria-label="Найти"><i class="bi bi-search" aria-hidden="true"></i></button>
+          </div>
+        </form>
+
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="catalog-count" aria-live="polite">
+            Найдено: <strong>{{ products.total }}</strong> товаров
+          </span>
+          <label for="sortSelect" class="visually-hidden">Сортировка</label>
+          <select id="sortSelect" name="sort" class="sort-select"
+                  onchange="this.form.submit()" form="filter-form"
+                  aria-label="Сортировка товаров">
+            <option value="default"    {% if sort == 'default'    %}selected{% endif %}>По умолчанию</option>
+            <option value="price_asc"  {% if sort == 'price_asc'  %}selected{% endif %}>Цена ↑</option>
+            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+            <option value="newest"     {% if sort == 'newest'     %}selected{% endif %}>Новинки</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Сетка товаров -->
+      {% if products.items %}
+      <div class="products-grid" aria-label="Список товаров">
+        {% for product in products.items %}
+        <article class="product-card">
+          <a href="{{ url_for('product_detail', slug=product.slug) }}" class="product-card-img"
+             aria-label="{{ product.name }}">
+            <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+            <div class="product-badges">
+              {% if product.is_new %}<span class="badge badge-new">Новинка</span>{% endif %}
+              {% if product.is_sale and product.discount_percent %}
+              <span class="badge badge-sale">-{{ product.discount_percent }}%</span>
+              {% endif %}
+              {% if product.is_featured %}<span class="badge badge-featured">Хит</span>{% endif %}
+            </div>
+          </a>
+          <div class="product-card-body">
+            <h2 class="product-card-name" style="font-size:.92rem;">
+              <a href="{{ url_for('product_detail', slug=product.slug) }}">{{ product.name }}</a>
+            </h2>
+            <p class="product-card-desc">{{ product.description }}</p>
+            <div class="product-card-price">
+              <span class="price-current">{{ '{:,.0f}'.format(product.price) }} ₽</span>
+              {% if product.old_price %}
+              <span class="price-old">{{ '{:,.0f}'.format(product.old_price) }} ₽</span>
+              {% endif %}
+            </div>
+            <div class="product-card-actions">
+              <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline btn-sm">
+                Подробнее
+              </a>
+              <button type="button" class="btn btn-primary btn-sm" data-cart-add="{{ product.id }}"
+                      aria-label="Добавить {{ product.name }} в корзину">
+                <i class="bi bi-cart-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <!-- Пагинация -->
+      {% if products.pages > 1 %}
+      <nav class="pagination" aria-label="Страницы каталога">
+        {% if products.has_prev %}
+        <a href="{{ url_for('catalog', category_slug=current_category.slug if current_category else None, page=products.prev_num, sort=sort, q=search_q) }}"
+           class="page-btn" aria-label="Предыдущая страница">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </a>
+        {% else %}
+        <span class="page-btn disabled" aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+        {% endif %}
+
+        {% for num in products.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+          {% if num %}
+          <a href="{{ url_for('catalog', category_slug=current_category.slug if current_category else None, page=num, sort=sort, q=search_q) }}"
+             class="page-btn {% if num == products.page %}active{% endif %}"
+             {% if num == products.page %}aria-current="page"{% endif %}>
+            {{ num }}
+          </a>
+          {% else %}
+          <span class="page-btn" aria-hidden="true">…</span>
+          {% endif %}
+        {% endfor %}
+
+        {% if products.has_next %}
+        <a href="{{ url_for('catalog', category_slug=current_category.slug if current_category else None, page=products.next_num, sort=sort, q=search_q) }}"
+           class="page-btn" aria-label="Следующая страница">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </a>
+        {% else %}
+        <span class="page-btn disabled" aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+      {% else %}
+      <!-- Пусто -->
+      <div style="text-align:center;padding:60px 20px;color:var(--text-muted);">
+        <i class="bi bi-search" style="font-size:3rem;color:var(--border);display:block;margin-bottom:16px;" aria-hidden="true"></i>
+        <h2 style="font-size:1.3rem;margin-bottom:8px;">Товары не найдены</h2>
+        <p style="margin-bottom:24px;">Попробуйте изменить параметры фильтра или поискового запроса.</p>
+        <a href="{{ url_for('catalog', category_slug=current_category.slug if current_category else None) }}"
+           class="btn btn-primary">
+          Сбросить фильтры
+        </a>
+      </div>
+      {% endif %}
+
+    </div><!-- /.catalog-main -->
+  </div><!-- /.catalog-layout -->
+</div><!-- /.container -->
+{% endblock %}

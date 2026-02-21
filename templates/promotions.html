@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Акции и скидки{% endblock %}
+{% block description %}Текущие акции, скидки и специальные предложения магазинов ДомашнийУют.{% endblock %}
+
+{% block content %}
+
+<!-- Заголовок страницы -->
+<div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:56px 0;"
+     aria-labelledby="promo-heading">
+  <div class="container" style="text-align:center;">
+    <h1 id="promo-heading" style="color:#fff;font-size:2.5rem;margin-bottom:12px;">
+      <i class="bi bi-tag-fill" aria-hidden="true"></i> Акции и скидки
+    </h1>
+    <p style="opacity:.9;font-size:1.05rem;max-width:500px;margin:0 auto;">
+      Лучшие предложения для наших покупателей. Не упустите выгоду!
+    </p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Текущие акции -->
+  {% if promotions %}
+  <section class="section" aria-labelledby="active-promos-heading">
+    <h2 id="active-promos-heading" class="section-title" style="margin-bottom:32px;">Текущие акции</h2>
+
+    <div class="promo-grid">
+      {% for promo in promotions %}
+      <article class="promo-card">
+        <div class="promo-card-img">
+          <img src="{{ promo.image }}" alt="{{ promo.title }}" loading="lazy">
+        </div>
+        <div class="promo-card-body">
+          {% if promo.discount_text %}
+          <div class="promo-discount">{{ promo.discount_text }}</div>
+          {% endif %}
+          <h3 class="promo-card-title">{{ promo.title }}</h3>
+          {% if promo.description %}
+          <p class="promo-card-desc">{{ promo.description }}</p>
+          {% endif %}
+          {% if promo.promo_code %}
+          <div class="promo-code" data-code="{{ promo.promo_code }}"
+               role="button" tabindex="0"
+               title="Нажмите для копирования промокода"
+               aria-label="Промокод {{ promo.promo_code }}, нажмите для копирования">
+            <i class="bi bi-clipboard" aria-hidden="true"></i>
+            Промокод: <strong>{{ promo.promo_code }}</strong>
+          </div>
+          {% endif %}
+          <a href="{{ url_for('catalog') }}" class="btn btn-primary">
+            Перейти в каталог <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Товары со скидкой -->
+  {% if sale_products %}
+  <section class="section section-alt" style="margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px;"
+           aria-labelledby="sale-products-heading">
+    <div style="padding:0;">
+      <div class="section-header" style="margin-bottom:32px;">
+        <div>
+          <h2 id="sale-products-heading" class="section-title">Товары со скидкой</h2>
+          <p class="section-subtitle">Успейте купить по выгодной цене</p>
+        </div>
+        <a href="{{ url_for('catalog') }}?sale=1" class="btn btn-outline">
+          Все товары со скидкой <i class="bi bi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="products-grid">
+        {% for product in sale_products %}
+        <article class="product-card">
+          <a href="{{ url_for('product_detail', slug=product.slug) }}" class="product-card-img"
+             aria-label="{{ product.name }}">
+            <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+            <div class="product-badges">
+              <span class="badge badge-sale">-{{ product.discount_percent }}%</span>
+              {% if product.is_new %}<span class="badge badge-new">Новинка</span>{% endif %}
+            </div>
+          </a>
+          <div class="product-card-body">
+            <h3 class="product-card-name">
+              <a href="{{ url_for('product_detail', slug=product.slug) }}">{{ product.name }}</a>
+            </h3>
+            <div class="product-card-price">
+              <span class="price-current">{{ '{:,.0f}'.format(product.price) }} ₽</span>
+              {% if product.old_price %}
+              <span class="price-old">{{ '{:,.0f}'.format(product.old_price) }} ₽</span>
+              {% endif %}
+            </div>
+            <div class="product-card-actions">
+              <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline btn-sm">Подробнее</a>
+              <button type="button" class="btn btn-primary btn-sm" data-cart-add="{{ product.id }}"
+                      aria-label="Добавить в корзину">
+                <i class="bi bi-cart-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Условия получения скидок -->
+  <section class="section" aria-labelledby="conditions-heading">
+    <h2 id="conditions-heading" class="section-title" style="margin-bottom:32px;">Как получить скидку</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;">
+      {% set steps = [
+        ('1', 'bi-person-plus', 'Зарегистрируйтесь', 'Создайте аккаунт и получите -15% на первый заказ.'),
+        ('2', 'bi-search', 'Найдите нужное', 'Выберите товары из ассортимента более 5 000 позиций.'),
+        ('3', 'bi-clipboard-check', 'Введите промокод', 'Введите промокод при оформлении заказа.'),
+        ('4', 'bi-truck', 'Получите заказ', 'Доставка по Москве от 1 дня, по России до 7 дней.'),
+      ] %}
+      {% for num, icon, title, desc in steps %}
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);
+                  padding:24px;text-align:center;">
+        <div style="width:48px;height:48px;background:var(--primary);color:#fff;border-radius:var(--r-full);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:1.3rem;font-weight:700;margin:0 auto 16px;" aria-hidden="true">
+          {{ num }}
+        </div>
+        <i class="bi {{ icon }}" style="font-size:1.5rem;color:var(--primary);margin-bottom:12px;display:block;" aria-hidden="true"></i>
+        <h3 style="font-size:1rem;margin-bottom:8px;">{{ title }}</h3>
+        <p style="font-size:.85rem;color:var(--text-secondary);">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

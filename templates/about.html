@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}О компании{% endblock %}
+{% block description %}ДомашнийУют — сеть магазинов товаров для дома с 2010 года. Миссия, история, команда и наши ценности.{% endblock %}
+
+{% block content %}
+
+<!-- Герой-баннер -->
+<section class="about-hero" aria-labelledby="about-heading">
+  <div class="container">
+    <h1 id="about-heading">О компании «ДомашнийУют»</h1>
+    <p>Создаём уют в каждом доме с 2010 года. Более 5 000 товаров, 5 магазинов, 200 000 довольных покупателей.</p>
+  </div>
+</section>
+
+<!-- Статистика -->
+<section class="section" aria-labelledby="stats-heading">
+  <div class="container">
+    <h2 class="section-title text-center" id="stats-heading" style="margin-bottom:40px;">Цифры говорят за нас</h2>
+    <div class="stats-grid">
+      {% set stats = [
+        ('14', 'лет на рынке'),
+        ('5 000+', 'товаров в каталоге'),
+        ('5', 'магазинов в России'),
+        ('200 000+', 'довольных покупателей'),
+      ] %}
+      {% for number, label in stats %}
+      <div class="stat-card">
+        <span class="stat-number">{{ number }}</span>
+        <p class="stat-label">{{ label }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- История -->
+<section class="section section-alt" aria-labelledby="history-heading">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+      <div>
+        <h2 id="history-heading" style="margin-bottom:20px;">Наша история</h2>
+        <p style="color:var(--text-secondary);margin-bottom:16px;line-height:1.8;">
+          Компания «ДомашнийУют» была основана в 2010 году в Москве с единственной целью —
+          помочь людям создать дома то самое ощущение уюта, которое так ценится в современном мире.
+        </p>
+        <p style="color:var(--text-secondary);margin-bottom:16px;line-height:1.8;">
+          Начав с небольшого магазина на улице Садовой, мы выросли в сеть из пяти магазинов в Москве
+          и Санкт-Петербурге, а также полноценный интернет-магазин с доставкой по всей России.
+        </p>
+        <p style="color:var(--text-secondary);line-height:1.8;">
+          Сегодня в нашем ассортименте более 5 000 наименований товаров: мебель, текстиль, декор,
+          кухонные принадлежности, освещение и системы хранения.
+        </p>
+      </div>
+      <div style="background:var(--bg-muted);border-radius:var(--r-lg);aspect-ratio:4/3;
+                  display:flex;align-items:center;justify-content:center;font-size:4rem;color:var(--primary);">
+        <i class="bi bi-house-heart-fill" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Наши ценности -->
+<section class="section" aria-labelledby="values-heading">
+  <div class="container">
+    <h2 class="section-title text-center" id="values-heading">Наши ценности</h2>
+    <p class="section-subtitle text-center">Принципы, которыми мы руководствуемся в работе</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;">
+      {% set values = [
+        ('bi-heart-fill', 'Забота о покупателе', 'Каждый покупатель — наш главный приоритет. Мы делаем всё, чтобы покупка была приятной.'),
+        ('bi-gem', 'Качество', 'Мы тщательно отбираем поставщиков и проверяем каждую партию товаров.'),
+        ('bi-leaf', 'Экологичность', 'Отдаём предпочтение натуральным материалам и ответственным производителям.'),
+        ('bi-lightbulb-fill', 'Инновации', 'Постоянно обновляем ассортимент, следим за трендами и внедряем новые решения.'),
+        ('bi-people-fill', 'Сообщество', 'Создаём сообщество людей, влюблённых в уют и красивые дома.'),
+        ('bi-currency-dollar', 'Честные цены', 'Работаем без наценок-посредников, напрямую с производителями.'),
+      ] %}
+      {% for icon, title, desc in values %}
+      <div class="stat-card" style="text-align:left;">
+        <div style="font-size:2rem;color:var(--primary);margin-bottom:16px;">
+          <i class="bi {{ icon }}" aria-hidden="true"></i>
+        </div>
+        <h3 style="font-size:1rem;margin-bottom:8px;">{{ title }}</h3>
+        <p style="font-size:.88rem;color:var(--text-secondary);">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Команда -->
+<section class="section section-alt" aria-labelledby="team-heading">
+  <div class="container">
+    <h2 class="section-title text-center" id="team-heading">Наша команда</h2>
+    <p class="section-subtitle text-center">Люди, которые создают уют для вас</p>
+
+    <div class="team-grid">
+      {% set team = [
+        ('bi-person-fill', 'Алексей Морозов', 'Генеральный директор', '14 лет в ритейле товаров для дома'),
+        ('bi-person-fill', 'Елена Иванова', 'Коммерческий директор', 'Эксперт по закупкам и ассортименту'),
+        ('bi-person-fill', 'Дмитрий Волков', 'Директор по маркетингу', 'Продвижение и digital-стратегия'),
+        ('bi-person-fill', 'Анна Соколова', 'Дизайнер-консультант', 'Поможет создать интерьер мечты'),
+      ] %}
+      {% for icon, name, role, bio in team %}
+      <div class="team-card">
+        <div class="team-avatar" aria-hidden="true">
+          <i class="bi {{ icon }}"></i>
+        </div>
+        <div class="team-name">{{ name }}</div>
+        <div class="team-role">{{ role }}</div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-top:8px;">{{ bio }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="text-align:center;">
+  <div class="container">
+    <h2 style="margin-bottom:12px;">Готовы преобразить ваш дом?</h2>
+    <p style="color:var(--text-secondary);margin-bottom:28px;">
+      Посетите наши магазины или сделайте заказ онлайн.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-lg">
+        <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Перейти в каталог
+      </a>
+      <a href="{{ url_for('contacts') }}" class="btn btn-outline btn-lg">
+        <i class="bi bi-geo-alt" aria-hidden="true"></i> Найти магазин
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

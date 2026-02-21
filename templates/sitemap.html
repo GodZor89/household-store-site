@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Карта сайта{% endblock %}
+{% block description %}Полная карта сайта ДомашнийУют — все разделы, страницы и категории.{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:40px;padding-bottom:64px;">
+
+  <h1 style="margin-bottom:8px;">
+    <i class="bi bi-diagram-3" aria-hidden="true"></i> Карта сайта
+  </h1>
+  <p style="color:var(--text-secondary);margin-bottom:40px;">
+    Полная структура сайта «ДомашнийУют»
+  </p>
+
+  <div class="sitemap-grid">
+
+    <!-- Основные страницы -->
+    <section class="sitemap-section" aria-labelledby="main-pages-heading">
+      <h2 id="main-pages-heading">
+        <i class="bi bi-house-fill" aria-hidden="true"></i> Основные страницы
+      </h2>
+      <ul>
+        <li><a href="{{ url_for('index') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Главная</a></li>
+        <li><a href="{{ url_for('catalog') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Каталог товаров</a></li>
+        <li><a href="{{ url_for('news') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Новости и статьи</a></li>
+        <li><a href="{{ url_for('promotions') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Акции и скидки</a></li>
+        <li><a href="{{ url_for('about') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> О компании</a></li>
+        <li><a href="{{ url_for('contacts') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Контакты</a></li>
+        <li><a href="{{ url_for('search') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Поиск по сайту</a></li>
+        <li><a href="{{ url_for('cart_view') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Корзина</a></li>
+      </ul>
+    </section>
+
+    <!-- Личный кабинет -->
+    <section class="sitemap-section" aria-labelledby="account-pages-heading">
+      <h2 id="account-pages-heading">
+        <i class="bi bi-person-circle" aria-hidden="true"></i> Аккаунт
+      </h2>
+      <ul>
+        <li><a href="{{ url_for('login') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Вход</a></li>
+        <li><a href="{{ url_for('register') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Регистрация</a></li>
+        {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('profile') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Личный кабинет</a></li>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_manager() %}
+        <li><a href="{{ url_for('admin') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Панель управления</a></li>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.is_admin() %}
+        <li><a href="{{ url_for('admin_users') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Управление пользователями</a></li>
+        <li><a href="{{ url_for('admin_user_create') }}"><i class="bi bi-chevron-right" aria-hidden="true"></i> Создать пользователя</a></li>
+        {% endif %}
+      </ul>
+    </section>
+
+    <!-- Категории каталога -->
+    <section class="sitemap-section" aria-labelledby="catalog-pages-heading">
+      <h2 id="catalog-pages-heading">
+        <i class="bi bi-grid-3x3-gap-fill" aria-hidden="true"></i> Категории каталога
+      </h2>
+      <ul>
+        {% for cat in categories %}
+        <li>
+          <a href="{{ url_for('catalog', category_slug=cat.slug) }}">
+            <i class="bi {{ cat.icon }}" aria-hidden="true"></i> {{ cat.name }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <!-- Новости -->
+    <section class="sitemap-section" aria-labelledby="news-pages-heading">
+      <h2 id="news-pages-heading">
+        <i class="bi bi-newspaper" aria-hidden="true"></i> Последние новости
+      </h2>
+      <ul>
+        {% for article in news_list[:10] %}
+        <li>
+          <a href="{{ url_for('news_detail', slug=article.slug) }}">
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            {{ article.title[:60] }}{% if article.title|length > 60 %}…{% endif %}
+          </a>
+        </li>
+        {% endfor %}
+        {% if news_list|length > 10 %}
+        <li>
+          <a href="{{ url_for('news') }}">
+            <i class="bi bi-three-dots" aria-hidden="true"></i> Все статьи ({{ news_list|length }})
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </section>
+
+  </div>
+</div>
+{% endblock %}

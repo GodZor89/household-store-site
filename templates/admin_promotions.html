@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Акции — Панель управления{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+  <div class="admin-layout">
+
+    {% include '_admin_sidebar.html' %}
+
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <h1 style="margin:0;">
+          <i class="bi bi-tag" aria-hidden="true"></i> Акции и скидки
+          <span style="font-size:1rem;color:var(--text-muted);font-weight:400;">({{ promos|length }})</span>
+        </h1>
+        <a href="{{ url_for('admin_promo_create') }}" class="btn btn-primary">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i> Добавить акцию
+        </a>
+      </div>
+
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="Список акций">
+            <thead>
+              <tr>
+                <th scope="col" style="width:50px;">ID</th>
+                <th scope="col">Название</th>
+                <th scope="col">Скидка</th>
+                <th scope="col">Промокод</th>
+                <th scope="col">Статус</th>
+                <th scope="col" style="width:130px;">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for promo in promos %}
+              <tr>
+                <td style="color:var(--text-muted);font-size:.82rem;">{{ promo.id }}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    {% if promo.image %}
+                    <img src="{{ promo.image }}" alt="" loading="lazy"
+                         style="width:48px;height:36px;object-fit:cover;border-radius:4px;flex-shrink:0;">
+                    {% endif %}
+                    <div>
+                      <div style="font-weight:600;font-size:.9rem;">{{ promo.title }}</div>
+                      {% if promo.description %}
+                      <div style="font-size:.78rem;color:var(--text-muted);">
+                        {{ promo.description[:60] }}{% if promo.description|length > 60 %}…{% endif %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  {% if promo.discount_text %}
+                  <span class="badge badge-sale" style="font-size:.82rem;">{{ promo.discount_text }}</span>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  {% if promo.promo_code %}
+                  <code style="background:var(--bg-muted);padding:2px 8px;border-radius:4px;font-size:.85rem;">
+                    {{ promo.promo_code }}
+                  </code>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  {% if promo.is_active %}
+                  <span style="color:var(--success);font-size:.82rem;font-weight:600;">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Активна
+                  </span>
+                  {% else %}
+                  <span style="color:var(--text-muted);font-size:.82rem;">
+                    <i class="bi bi-x-circle" aria-hidden="true"></i> Неактивна
+                  </span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <a href="{{ url_for('admin_promo_edit', promo_id=promo.id) }}"
+                       class="btn btn-outline btn-sm"
+                       aria-label="Редактировать акцию">
+                      <i class="bi bi-pencil" aria-hidden="true"></i>
+                    </a>
+                    {% if current_user.is_admin() %}
+                    <form action="{{ url_for('admin_promo_delete', promo_id=promo.id) }}" method="POST"
+                          onsubmit="return confirm('Удалить акцию «{{ promo.title }}»?')">
+                      <button type="submit" class="btn btn-sm"
+                              style="color:var(--danger);border:1px solid var(--danger);"
+                              aria-label="Удалить акцию">
+                        <i class="bi bi-trash" aria-hidden="true"></i>
+                      </button>
+                    </form>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">
+                  Акции отсутствуют
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

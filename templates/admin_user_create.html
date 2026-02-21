@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Создание пользователя{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+
+  <div class="admin-layout">
+    <!-- Боковая панель -->
+    {% include '_admin_sidebar.html' %}
+
+    <div>
+      <h1 style="margin-bottom:28px;">Создание пользователя</h1>
+
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:32px;max-width:600px;">
+
+        <div style="background:var(--bg-muted);border-radius:var(--r-sm);padding:14px;margin-bottom:24px;font-size:.88rem;color:var(--text-secondary);">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          Сценарий: создание пользователя администратором. Пользователь получит доступ согласно назначенной роли.
+        </div>
+
+        <form action="{{ url_for('admin_user_create') }}" method="POST" novalidate
+              aria-label="Форма создания пользователя">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label for="username" class="form-label">
+                Логин <span class="req" aria-label="обязательное">*</span>
+              </label>
+              <input type="text" id="username" name="username" class="form-control"
+                     placeholder="Мин. 3 символа" required minlength="3"
+                     value="{{ request.form.get('username', '') }}" autofocus>
+            </div>
+            <div class="form-group">
+              <label for="role" class="form-label">
+                Роль <span class="req" aria-label="обязательное">*</span>
+              </label>
+              <select id="role" name="role" class="form-control" required>
+                <option value="user"    {% if request.form.get('role','user') == 'user'    %}selected{% endif %}>Покупатель</option>
+                <option value="manager" {% if request.form.get('role') == 'manager' %}selected{% endif %}>Менеджер</option>
+                <option value="admin"   {% if request.form.get('role') == 'admin'   %}selected{% endif %}>Администратор</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="full_name" class="form-label">Имя и фамилия</label>
+            <input type="text" id="full_name" name="full_name" class="form-control"
+                   placeholder="Иван Иванов" autocomplete="name"
+                   value="{{ request.form.get('full_name', '') }}">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label for="email" class="form-label">
+                Email <span class="req" aria-label="обязательное">*</span>
+              </label>
+              <input type="email" id="email" name="email" class="form-control"
+                     placeholder="email@example.com" required
+                     value="{{ request.form.get('email', '') }}">
+            </div>
+            <div class="form-group">
+              <label for="phone" class="form-label">Телефон</label>
+              <input type="tel" id="phone" name="phone" class="form-control"
+                     placeholder="+7 (___) ___-__-__"
+                     value="{{ request.form.get('phone', '') }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">
+              Пароль <span class="req" aria-label="обязательное">*</span>
+            </label>
+            <input type="password" id="password" name="password" class="form-control"
+                   placeholder="Минимум 6 символов" required minlength="6">
+            <small style="color:var(--text-muted);font-size:.78rem;">
+              Сообщите пользователю временный пароль. Рекомендуется сменить после первого входа.
+            </small>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:24px;">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-person-check" aria-hidden="true"></i> Создать пользователя
+            </button>
+            <a href="{{ url_for('admin_users') }}" class="btn btn-outline">Отмена</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

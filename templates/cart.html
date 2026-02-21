@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+
+  <nav class="breadcrumb" aria-label="Путь навигации">
+    <a href="{{ url_for('index') }}">Главная</a>
+    <span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">Корзина</span>
+  </nav>
+
+  <h1 style="margin-bottom:32px;">
+    Корзина {% if items %}<span style="font-size:1rem;color:var(--text-muted);font-family:'Inter',sans-serif;">({{ items|length }} позиции)</span>{% endif %}
+  </h1>
+
+  {% if items %}
+  <div class="cart-layout">
+
+    <!-- Список товаров -->
+    <div>
+      {% for item in items %}
+      <div class="cart-item">
+        <a href="{{ url_for('product_detail', slug=item.product.slug) }}" aria-label="{{ item.product.name }}">
+          <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-item-img" loading="lazy">
+        </a>
+        <div>
+          <div class="cart-item-name">
+            <a href="{{ url_for('product_detail', slug=item.product.slug) }}">{{ item.product.name }}</a>
+          </div>
+          <div class="cart-item-price">{{ '{:,.0f}'.format(item.product.price) }} ₽ за шт.</div>
+        </div>
+
+        <!-- Изменение количества -->
+        <form action="{{ url_for('cart_update', product_id=item.product.id) }}" method="POST"
+              aria-label="Изменить количество {{ item.product.name }}">
+          <div class="qty-control">
+            <button type="button" class="qty-btn qty-minus"
+                    onclick="this.closest('form').querySelector('input').stepDown();this.closest('form').submit();"
+                    aria-label="Уменьшить количество">−</button>
+            <input type="number" name="qty" class="qty-input" value="{{ item.qty }}" min="0" max="99"
+                   aria-label="Количество">
+            <button type="button" class="qty-btn qty-plus"
+                    onclick="this.closest('form').querySelector('input').stepUp();this.closest('form').submit();"
+                    aria-label="Увеличить количество">+</button>
+          </div>
+        </form>
+
+        <!-- Сумма и удаление -->
+        <div style="text-align:right;">
+          <div style="font-size:1.1rem;font-weight:700;color:var(--primary);">
+            {{ '{:,.0f}'.format(item.subtotal) }} ₽
+          </div>
+          <form action="{{ url_for('cart_remove', product_id=item.product.id) }}" method="POST">
+            <button type="submit" class="btn btn-sm" style="color:var(--danger);margin-top:8px;padding:4px 8px;"
+                    aria-label="Удалить {{ item.product.name }} из корзины">
+              <i class="bi bi-trash" aria-hidden="true"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Очистить корзину -->
+      <form action="{{ url_for('cart_clear') }}" method="POST" style="margin-top:16px;">
+        <button type="submit" class="btn btn-outline"
+                onclick="return confirm('Очистить корзину?')"
+                aria-label="Очистить всю корзину">
+          <i class="bi bi-trash" aria-hidden="true"></i> Очистить корзину
+        </button>
+      </form>
+    </div>
+
+    <!-- Итоговая сумма -->
+    <div class="cart-summary" aria-labelledby="cart-summary-heading">
+      <h2 id="cart-summary-heading" class="cart-summary-title">Итого</h2>
+
+      {% for item in items %}
+      <div class="cart-summary-row">
+        <span style="font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">
+          {{ item.product.name }}
+        </span>
+        <span style="white-space:nowrap;">{{ '{:,.0f}'.format(item.subtotal) }} ₽</span>
+      </div>
+      {% endfor %}
+
+      <div class="cart-summary-row">
+        <span>Доставка</span>
+        <span>{% if total >= 5000 %}Бесплатно{% else %}от 490 ₽{% endif %}</span>
+      </div>
+
+      <div class="cart-summary-total">
+        <span>Итого</span>
+        <span class="price">{{ '{:,.0f}'.format(total) }} ₽</span>
+      </div>
+
+      {% if total < 5000 %}
+      <p style="font-size:.8rem;color:var(--text-muted);margin-top:10px;">
+        <i class="bi bi-truck" aria-hidden="true"></i>
+        До бесплатной доставки: {{ '{:,.0f}'.format(5000 - total) }} ₽
+      </p>
+      {% else %}
+      <p style="font-size:.8rem;color:var(--success);margin-top:10px;">
+        <i class="bi bi-check-circle" aria-hidden="true"></i>
+        Бесплатная доставка!
+      </p>
+      {% endif %}
+
+      <!-- Промокод -->
+      <div style="margin:20px 0;">
+        <label for="promoCode" class="form-label" style="font-size:.85rem;">Промокод</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="promoCode" class="form-control" placeholder="Введите промокод"
+                 aria-label="Промокод для скидки">
+          <button type="button" class="btn btn-outline" onclick="alert('Промокод принят!');"
+                  aria-label="Применить промокод">
+            ОК
+          </button>
+        </div>
+      </div>
+
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block btn-lg">
+        <i class="bi bi-bag-check-fill" aria-hidden="true"></i> Оформить заказ
+      </a>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-lg">
+        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Войти для оформления
+      </a>
+      <a href="{{ url_for('register') }}" class="btn btn-outline btn-block" style="margin-top:8px;">
+        Зарегистрироваться
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Пустая корзина -->
+  <div class="error-page" style="flex:none;padding:60px 20px;">
+    <div class="error-icon"><i class="bi bi-cart3" aria-hidden="true"></i></div>
+    <h2>Корзина пуста</h2>
+    <p>Добавьте товары из нашего каталога, чтобы оформить заказ.</p>
+    <a href="{{ url_for('catalog') }}" class="btn btn-primary btn-lg">
+      <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Перейти в каталог
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

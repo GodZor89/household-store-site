@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card" style="max-width:520px;">
+    <div class="auth-logo">
+      <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+      <h1>Создать аккаунт</h1>
+      <p>Зарегистрируйтесь и получите скидку 15%</p>
+    </div>
+
+    <form action="{{ url_for('register') }}" method="POST" novalidate aria-label="Форма регистрации">
+
+      <div class="form-group">
+        <label for="username" class="form-label">
+          Имя пользователя <span class="req" aria-label="обязательное поле">*</span>
+        </label>
+        <input type="text" id="username" name="username" class="form-control"
+               placeholder="Минимум 3 символа" required autocomplete="username"
+               value="{{ request.form.get('username', '') }}" autofocus minlength="3">
+      </div>
+
+      <div class="form-group">
+        <label for="full_name" class="form-label">Имя и фамилия</label>
+        <input type="text" id="full_name" name="full_name" class="form-control"
+               placeholder="Иван Иванов" autocomplete="name"
+               value="{{ request.form.get('full_name', '') }}">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label for="email" class="form-label">
+            Email <span class="req" aria-label="обязательное поле">*</span>
+          </label>
+          <input type="email" id="email" name="email" class="form-control"
+                 placeholder="ivan@example.com" required autocomplete="email"
+                 value="{{ request.form.get('email', '') }}">
+        </div>
+        <div class="form-group">
+          <label for="phone" class="form-label">Телефон</label>
+          <input type="tel" id="phone" name="phone" class="form-control"
+                 placeholder="+7 (___) ___-__-__" autocomplete="tel"
+                 value="{{ request.form.get('phone', '') }}">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label for="password" class="form-label">
+            Пароль <span class="req" aria-label="обязательное поле">*</span>
+          </label>
+          <input type="password" id="password" name="password" class="form-control"
+                 placeholder="Минимум 6 символов" required autocomplete="new-password" minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="password2" class="form-label">
+            Повторите пароль <span class="req" aria-label="обязательное поле">*</span>
+          </label>
+          <input type="password" id="password2" name="password2" class="form-control"
+                 placeholder="Повторите пароль" required autocomplete="new-password">
+        </div>
+      </div>
+
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:20px;">
+        Нажимая «Зарегистрироваться», вы соглашаетесь с условиями использования сайта.
+      </p>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        <i class="bi bi-person-check" aria-hidden="true"></i> Зарегистрироваться
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

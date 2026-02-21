@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:32px;padding-bottom:64px;">
+
+  <h1 style="margin-bottom:32px;">Личный кабинет</h1>
+
+  <div class="profile-layout">
+
+    <!-- Боковая панель профиля -->
+    <aside class="profile-sidebar">
+      <div class="profile-user-info">
+        <div class="profile-avatar" aria-hidden="true">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="profile-name">{{ current_user.full_name or current_user.username }}</div>
+        <span class="profile-role">
+          {% if current_user.is_admin() %}Администратор
+          {% elif current_user.is_manager() %}Менеджер
+          {% else %}Покупатель{% endif %}
+        </span>
+        <div style="font-size:.78rem;opacity:.8;margin-top:6px;">
+          С нами с {{ current_user.created_at.strftime('%d.%m.%Y') }}
+        </div>
+      </div>
+      <nav class="profile-nav" aria-label="Меню личного кабинета">
+        <a href="{{ url_for('profile') }}" class="active">
+          <i class="bi bi-person" aria-hidden="true"></i> Мой профиль
+        </a>
+        <a href="{{ url_for('profile_orders') }}">
+          <i class="bi bi-bag-check" aria-hidden="true"></i> Мои заказы
+        </a>
+        <a href="{{ url_for('cart_view') }}">
+          <i class="bi bi-cart3" aria-hidden="true"></i> Корзина
+          {% if cart_count > 0 %}<span class="badge badge-new" style="margin-left:auto;">{{ cart_count }}</span>{% endif %}
+        </a>
+        {% if current_user.is_manager() %}
+        <a href="{{ url_for('admin') }}">
+          <i class="bi bi-gear" aria-hidden="true"></i> Панель управления
+        </a>
+        {% endif %}
+        {% if current_user.is_admin() %}
+        <a href="{{ url_for('admin_users') }}">
+          <i class="bi bi-people" aria-hidden="true"></i> Управление пользователями
+        </a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" style="color:var(--danger);">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Выйти
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Основной контент -->
+    <div>
+
+      <!-- Данные профиля -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;margin-bottom:24px;"
+               aria-labelledby="profile-data-heading">
+        <h2 id="profile-data-heading" style="font-size:1.1rem;margin-bottom:24px;">
+          <i class="bi bi-person-circle" aria-hidden="true"></i> Данные профиля
+        </h2>
+
+        <form action="{{ url_for('profile_update') }}" method="POST" novalidate aria-label="Форма обновления профиля">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label for="full_name" class="form-label">Имя и фамилия</label>
+              <input type="text" id="full_name" name="full_name" class="form-control"
+                     value="{{ current_user.full_name or '' }}" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="phone" class="form-label">Телефон</label>
+              <input type="tel" id="phone" name="phone" class="form-control"
+                     value="{{ current_user.phone or '' }}" autocomplete="tel"
+                     placeholder="+7 (___) ___-__-__">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="{{ current_user.email }}"
+                   disabled aria-label="Email нельзя изменить">
+            <small style="color:var(--text-muted);font-size:.78rem;">
+              Email изменить нельзя. Обратитесь в поддержку.
+            </small>
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border-light);margin:24px 0;">
+
+          <h3 style="font-size:1rem;margin-bottom:16px;">Сменить пароль</h3>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            <div class="form-group">
+              <label for="current_password" class="form-label">Текущий пароль</label>
+              <input type="password" id="current_password" name="current_password"
+                     class="form-control" autocomplete="current-password">
+            </div>
+            <div class="form-group">
+              <label for="new_password" class="form-label">Новый пароль</label>
+              <input type="password" id="new_password" name="new_password"
+                     class="form-control" placeholder="Мин. 6 символов" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label for="new_password2" class="form-label">Повторите пароль</label>
+              <input type="password" id="new_password2" name="new_password2"
+                     class="form-control" autocomplete="new-password">
+            </div>
+          </div>
+          <small style="color:var(--text-muted);font-size:.78rem;">
+            Оставьте поля пустыми, если не хотите менять пароль.
+          </small>
+
+          <div style="margin-top:24px;">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-circle" aria-hidden="true"></i> Сохранить изменения
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Мои обращения -->
+      <section style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:28px;"
+               aria-labelledby="messages-heading">
+        <h2 id="messages-heading" style="font-size:1.1rem;margin-bottom:20px;">
+          <i class="bi bi-chat-dots" aria-hidden="true"></i> Мои обращения
+        </h2>
+
+        {% if user_messages %}
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="История обращений">
+            <thead>
+              <tr>
+                <th scope="col">Дата</th>
+                <th scope="col">Тема</th>
+                <th scope="col">Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for msg in user_messages %}
+              <tr>
+                <td>{{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td>{{ msg.subject or '(без темы)' }}</td>
+                <td>
+                  {% if msg.is_read %}
+                  <span style="color:var(--success);font-size:.85rem;">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Прочитано
+                  </span>
+                  {% else %}
+                  <span style="color:var(--warning);font-size:.85rem;">
+                    <i class="bi bi-clock" aria-hidden="true"></i> Ожидает ответа
+                  </span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:32px;color:var(--text-muted);">
+          <i class="bi bi-chat-square-dots" style="font-size:2rem;display:block;margin-bottom:10px;" aria-hidden="true"></i>
+          <p style="margin-bottom:16px;">У вас пока нет обращений.</p>
+          <a href="{{ url_for('contacts') }}" class="btn btn-outline">
+            Написать нам
+          </a>
+        </div>
+        {% endif %}
+      </section>
+
+    </div><!-- /.profile-content -->
+  </div><!-- /.profile-layout -->
+</div>
+{% endblock %}

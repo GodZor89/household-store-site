@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Поиск: {{ query }}{% endblock %}
+
+{% block content %}
+
+<div class="search-header">
+  <div class="container">
+    <h1>
+      {% if query %}
+        Результаты поиска: «{{ query }}»
+      {% else %}
+        Поиск по сайту
+      {% endif %}
+    </h1>
+    {% if query %}
+    <p style="color:rgba(255,255,255,.8);">
+      Найдено: {{ products|length }} товаров, {{ articles|length }} статей
+    </p>
+    {% endif %}
+    <form action="{{ url_for('search') }}" method="GET" class="search-form" style="max-width:560px;margin-top:20px;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Введите запрос…" autofocus aria-label="Поисковый запрос">
+      <button type="submit" aria-label="Найти"><i class="bi bi-search" aria-hidden="true"></i></button>
+    </form>
+  </div>
+</div>
+
+<div class="container" style="padding-top:40px;padding-bottom:64px;">
+
+  {% if not query %}
+  <!-- Подсказки для поиска -->
+  <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
+    <i class="bi bi-search" style="font-size:3rem;display:block;margin-bottom:16px;color:var(--border);" aria-hidden="true"></i>
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">Введите поисковый запрос</h2>
+    <p>Поиск по товарам, новостям и статьям.</p>
+  </div>
+
+  {% elif not products and not articles %}
+  <!-- Ничего не найдено -->
+  <div style="text-align:center;padding:40px 0;">
+    <i class="bi bi-emoji-frown" style="font-size:3rem;display:block;margin-bottom:16px;color:var(--border);" aria-hidden="true"></i>
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">По запросу «{{ query }}» ничего не найдено</h2>
+    <p style="color:var(--text-secondary);margin-bottom:24px;">Попробуйте изменить запрос или просмотрите каталог товаров.</p>
+    <a href="{{ url_for('catalog') }}" class="btn btn-primary">Весь каталог</a>
+  </div>
+
+  {% else %}
+
+  <!-- Товары -->
+  {% if products %}
+  <section aria-labelledby="products-results-heading">
+    <div class="section-header" style="margin-bottom:24px;">
+      <h2 id="products-results-heading" class="section-title" style="font-size:1.4rem;">
+        <i class="bi bi-box-seam" aria-hidden="true"></i>
+        Товары ({{ products|length }})
+      </h2>
+      <a href="{{ url_for('catalog') }}?q={{ query }}" class="btn btn-outline btn-sm">
+        Все в каталоге
+      </a>
+    </div>
+    <div class="products-grid">
+      {% for product in products %}
+      <article class="product-card">
+        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="product-card-img" aria-label="{{ product.name }}">
+          <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+          {% if product.is_sale and product.discount_percent %}
+          <div class="product-badges"><span class="badge badge-sale">-{{ product.discount_percent }}%</span></div>
+          {% endif %}
+        </a>
+        <div class="product-card-body">
+          <h3 class="product-card-name">
+            <a href="{{ url_for('product_detail', slug=product.slug) }}">{{ product.name }}</a>
+          </h3>
+          <div class="product-card-price">
+            <span class="price-current">{{ '{:,.0f}'.format(product.price) }} ₽</span>
+            {% if product.old_price %}
+            <span class="price-old">{{ '{:,.0f}'.format(product.old_price) }} ₽</span>
+            {% endif %}
+          </div>
+          <div class="product-card-actions">
+            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline btn-sm">Подробнее</a>
+            <button type="button" class="btn btn-primary btn-sm" data-cart-add="{{ product.id }}"
+                    aria-label="Добавить в корзину">
+              <i class="bi bi-cart-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Статьи -->
+  {% if articles %}
+  <section style="margin-top:48px;" aria-labelledby="articles-results-heading">
+    <h2 id="articles-results-heading" class="section-title" style="font-size:1.4rem;margin-bottom:24px;">
+      <i class="bi bi-newspaper" aria-hidden="true"></i>
+      Статьи и новости ({{ articles|length }})
+    </h2>
+    <div class="news-grid">
+      {% for article in articles %}
+      <article class="news-card">
+        <a href="{{ url_for('news_detail', slug=article.slug) }}" class="news-card-img" aria-label="{{ article.title }}">
+          <img src="{{ article.image }}" alt="{{ article.title }}" loading="lazy">
+        </a>
+        <div class="news-card-body">
+          <span class="news-card-category">{{ article.category }}</span>
+          <h3 class="news-card-title">
+            <a href="{{ url_for('news_detail', slug=article.slug) }}">{{ article.title }}</a>
+          </h3>
+          {% if article.preview %}
+          <p class="news-card-preview">{{ article.preview }}</p>
+          {% endif %}
+          <div class="news-card-meta">
+            <span><i class="bi bi-calendar3" aria-hidden="true"></i> {{ article.created_at.strftime('%d.%m.%Y') }}</span>
+            <span><i class="bi bi-eye" aria-hidden="true"></i> {{ article.views }}</span>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}
